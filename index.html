@@ -375,9 +375,10 @@
             width="100" 
             height="100"
             />
-      </svg>
-    );
-  }
+          </svg>
+        );
+      };
+    
         let pattern = '';
         if (type.pattern === 'dots') pattern = `<circle cx="35" cy="40" r="3" fill="white" opacity="0.4"/><circle cx="65" cy="40" r="3" fill="white" opacity="0.4"/>`;
         if (type.pattern === 'stripes') pattern = `<rect x="30" y="45" width="40" height="2" fill="white" opacity="0.3"/><rect x="30" y="55" width="40" height="2" fill="white" opacity="0.3"/>`;
@@ -390,7 +391,7 @@
             <path d="M35 70 Q50 80 65 70" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="3" stroke-linecap="round"/>
             ${pattern}
         </svg>`;
-}
+      };
 
     function resetGameState() {
         state.ribbits = 0;
