@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Gaegu:wght@400;700&display=swap');
-     
+      
         :root {
             --bg-top: #a7f3d0;
             --bg-bottom: #4fac82;
@@ -63,21 +63,8 @@
         body.zen-active #zen-exit-detector { display: block; }
 
         #fx-layer, #fish-layer, #spirit-layer { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
-
-        /* === HEAVY RAIN === */
-        .rain-drop { 
-            position: absolute; 
-            background: linear-gradient(transparent, rgba(185, 220, 255, 0.9)); 
-            width: 2px; 
-            height: 45px; 
-            pointer-events: none; 
-            animation: rain-fall 0.45s linear infinite; 
-            opacity: 0.75;
-        }
-        @keyframes rain-fall { 
-            to { transform: translateY(100vh); } 
-        }
-
+        .rain-drop { position: absolute; background: rgba(255,255,255,0.4); width: 1px; height: 20px; pointer-events: none; animation: rain-fall 0.8s linear infinite; }
+        @keyframes rain-fall { to { transform: translateY(100vh); } }
         .snow-flake { position: absolute; background: white; border-radius: 50%; pointer-events: none; animation: snow-fall 3s linear infinite; }
         @keyframes snow-fall { to { transform: translateY(100vh) rotate(360deg); } }
         .spirit-orb {
@@ -265,8 +252,8 @@
     </div>
 </div>
 
-<!-- ADMIN PANEL -->
-<div id="admin-panel" class="modal-overlay" style="display: none;">
+<!-- ADMIN PANEL (Updated with inputs) -->
+<div id="admin-pane" class="modal-overlay" style="display: none;">
     <div class="admin-panel">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-3xl font-bold text-yellow-300">🐸 FROGO ADMIN PANEL 🐸</h2>
@@ -348,6 +335,7 @@
         pattern: i % 3 === 0 ? 'dots' : i % 3 === 1 ? 'stripes' : 'none'
     }));
 
+    // Zelda Frog (Link) - based on the plushie
     const ZELDA_FROG = {
         id: 999999,
         typeId: 0,
@@ -376,44 +364,497 @@
         isPlacingPad: false
     };
 
-    // ... [All your functions from getFrogSVG to removeFromPond remain exactly the same] ...
+    function getFrogSVG(type, isZelda = false) {
+        if (isZelda) {
+            return `<svg viewBox="0 0 100 100" style="width:100%; height:100%;">
+                <ellipse cx="50" cy="52" rx="34" ry="32" fill="#60a5fa" stroke="#1e40af" stroke-width="4"/>
+                <circle cx="38" cy="38" r="11" fill="#fcd34d"/>
+                <circle cx="62" cy="38" r="11" fill="#fcd34d"/>
+                <circle cx="38" cy="38" r="5" fill="#1e3a8a"/>
+                <circle cx="62" cy="38" r="5" fill="#1e3a8a"/>
+                <path d="M30 65 Q50 78 70 65" fill="none" stroke="#1e3a8a" stroke-width="4" stroke-linecap="round"/>
+                <path d="M25 25 Q50 12 75 25" fill="#fcd34d" opacity="0.9"/>
+            </svg>`;
+        }
+        let pattern = '';
+        if (type.pattern === 'dots') pattern = `<circle cx="35" cy="40" r="3" fill="white" opacity="0.4"/><circle cx="65" cy="40" r="3" fill="white" opacity="0.4"/>`;
+        if (type.pattern === 'stripes') pattern = `<rect x="30" y="45" width="40" height="2" fill="white" opacity="0.3"/><rect x="30" y="55" width="40" height="2" fill="white" opacity="0.3"/>`;
+        return `<svg viewBox="0 0 100 100" style="width:100%; height:100%;">
+            <ellipse cx="50" cy="55" rx="35" ry="30" fill="${type.color}" stroke="rgba(0,0,0,0.1)" stroke-width="2"/>
+            <circle cx="35" cy="35" r="10" fill="${type.color}"/>
+            <circle cx="65" cy="35" r="10" fill="${type.color}"/>
+            <circle cx="35" cy="35" r="4" fill="white"/><circle cx="35" cy="35" r="1.5" fill="black"/>
+            <circle cx="65" cy="35" r="4" fill="white"/><circle cx="65" cy="35" r="1.5" fill="black"/>
+            <path d="M35 70 Q50 80 65 70" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="3" stroke-linecap="round"/>
+            ${pattern}
+        </svg>`;
+    }
+
+    function resetGameState() {
+        state.ribbits = 0;
+        state.totalInEvo = 0;
+        state.evolution = 0;
+        state.pads = 1;
+        state.clickLv = 1;
+        state.totems = 0;
+        state.mult = 1.0;
+        state.zenMult = 1.0;
+        state.evoGoal = 100;
+        state.zenMode = false;
+        state.weather = 'idle';
+        state.myFrogs = [];
+        state.currentCatch = null;
+        state.placingFrogId = null;
+        state.isPlacingPad = false;
+        state.lastTapTime = 0;
+
+        document.querySelectorAll('.lily-pad').forEach((pad, index) => {
+            if (index > 0) pad.remove();
+        });
+        document.getElementById('pond-container').style.setProperty('--bg-top', '#a7f3d0');
+        document.getElementById('pond-container').style.setProperty('--bg-bottom', '#4fac82');
+        document.getElementById('fx-layer').innerHTML = '';
+        document.getElementById('spirit-layer').innerHTML = '';
+        cancelPlacement();
+    }
+
+    function startGame() {
+        state.gameStarted = true;
+        const ts = document.getElementById('title-screen');
+        ts.style.opacity = '0';
+        ts.style.transform = 'scale(1.1)';
+        document.getElementById('pond-container').classList.add('visible');
+        setTimeout(() => { ts.style.display = 'none'; }, 1500);
+        updateUI();
+    }
+
+    function pickRandomSubtitle() {
+        const sub = document.getElementById('random-subtitle');
+        sub.innerText = PHRASES[Math.floor(Math.random() * PHRASES.length)];
+    }
+
+    function checkProfanity(text) {
+        if (!text) return false;
+        const clean = text.toLowerCase().replace(/[^a-z0-9]/g, '');
+        return BANNED_TERMS.some(term => clean.includes(term));
+    }
+
+    function generateEvoName(level) {
+        if (level === 0) return "Morning Marsh";
+        const p = EVO_PREFIXES[Math.floor((level * 7) % EVO_PREFIXES.length)];
+        const n = EVO_NOUN[Math.floor((level * 13) % EVO_NOUN.length)];
+        return `${p} ${n}`;
+    }
+
+    function generateEvoColor(level) {
+        const hue1 = (140 + (level * 25)) % 360;
+        const hue2 = (hue1 + 40) % 360;
+        return [`hsl(${hue1}, 50%, 80%)`, `hsl(${hue2}, 40%, 45%)`];
+    }
+
+    function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen().catch(() => {});
+            document.getElementById('fs-icon').innerHTML = '<path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>';
+        } else {
+            document.exitFullscreen();
+            document.getElementById('fs-icon').innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>';
+        }
+    }
+
+    function updateUI() {
+        const frogBonusMult = state.myFrogs.reduce((acc, f) => {
+            const type = FROG_TYPES[f.typeId];
+            const active = (type.bonusWeather === state.weather || type.bonusWeather === 'idle') && f.padIndex !== -1;
+            return acc + (active ? type.bonusMult - 1 : 0);
+        }, 1);
+        const totalMult = state.mult * state.zenMult * frogBonusMult;
+
+        document.getElementById('score').innerText = Math.floor(state.ribbits).toLocaleString();
+        document.getElementById('multiplier').innerText = `x${totalMult.toFixed(1)}`;
+        document.getElementById('evo-name').innerText = generateEvoName(state.evolution);
+        document.getElementById('evo-level').innerText = state.evolution;
+        document.getElementById('evo-goal').innerText = `Goal: ${state.evoGoal.toLocaleString()}`;
+        document.getElementById('evo-bar').style.width = Math.min(100, (state.totalInEvo / state.evoGoal) * 100) + '%';
+        document.getElementById('frog-count').innerText = `Owned: ${state.myFrogs.length}`;
+
+        const pCost = Math.floor(150 * Math.pow(2.2, state.pads - 1));
+        const cCost = Math.floor(250 * Math.pow(1.7, state.clickLv - 1));
+        const tCost = Math.floor(5000 * Math.pow(3, state.totems));
+
+        document.getElementById('cost-pad').innerText = state.pads < 12 ? pCost.toLocaleString() : "MAX";
+        document.getElementById('cost-click').innerText = cCost.toLocaleString();
+        document.getElementById('cost-totem').innerText = tCost.toLocaleString();
+
+        document.getElementById('btn-add-pad').disabled = state.ribbits < pCost || state.pads >= 12;
+        document.getElementById('btn-click').disabled = state.ribbits < cCost;
+        document.getElementById('btn-totem').disabled = state.ribbits < tCost;
+    }
+
+    function gainRibbits(amt) {
+        state.ribbits += amt;
+        state.totalInEvo += amt;
+        if (state.totalInEvo >= state.evoGoal) evolve();
+        updateUI();
+    }
+
+    function evolve() {
+        state.evolution++;
+        state.totalInEvo = 0;
+        state.evoGoal = Math.floor(state.evoGoal * 2.8);
+        state.mult += 0.3 + (state.evolution * 0.08);
+        const pair = generateEvoColor(state.evolution);
+        document.getElementById('pond-container').style.setProperty('--bg-top', pair[0]);
+        document.getElementById('pond-container').style.setProperty('--bg-bottom', pair[1]);
+        document.getElementById('evo-desc').innerText = EVO_DESCS[Math.floor(Math.random() * EVO_DESCS.length)];
+        spawnSpiritBurst();
+        randomizeWeather();
+    }
+
+    // NERFED MONEY SYSTEM
+    function buyPad() {
+        const cost = Math.floor(150 * Math.pow(2.5, state.pads - 1));
+        if (state.ribbits < cost || state.pads >= 12) return;
+        state.ribbits -= cost;
+        state.isPlacingPad = true;
+        document.getElementById('placing-ui').classList.remove('hidden');
+        updateUI();
+    }
+
+    function buyClick() { 
+        const c = Math.floor(250 * Math.pow(1.9, state.clickLv - 1)); 
+        if(state.ribbits >= c){ state.ribbits -= c; state.clickLv++; updateUI(); }
+    }
+
+    function buyTotem() { 
+        const c = Math.floor(5000 * Math.pow(4, state.totems)); 
+        if(state.ribbits >= c){ state.ribbits -= c; state.totems++; updateUI(); }
+    }
+
+    // LILY PAD PLACEMENT
+    function handlePondClick(e) {
+        if (state.zenMode || !state.gameStarted) return;
+        if (state.isPlacingPad && !e.target.closest('.ui-root') && !e.target.closest('#placing-ui')) {
+            placeNewLilyPad(e);
+            return;
+        }
+        spawnRipple(e.clientX, e.clientY);
+    }
+
+    function placeNewLilyPad(e) {
+        if (!state.isPlacingPad) return;
+        const rect = document.getElementById('pond-container').getBoundingClientRect();
+        let clickX = e.clientX - rect.left;
+        let clickY = e.clientY - rect.top;
+        clickX = Math.max(70, Math.min(rect.width - 70, clickX));
+        clickY = Math.max(60, Math.min(rect.height - 60, clickY));
+
+        const padId = state.pads;
+        const pad = document.createElement('div');
+        pad.className = 'lily-pad';
+        pad.id = `pad-${padId}`;
+        pad.style.left = `${clickX - 60}px`;
+        pad.style.top = `${clickY - 50}px`;
+        pad.onclick = (ev) => handlePadInteraction(padId, ev);
+        document.getElementById('main-cluster').appendChild(pad);
+       
+        state.pads++;
+        state.isPlacingPad = false;
+        document.getElementById('placing-ui').classList.add('hidden');
+        updateUI();
+    }
+
+    function cancelPlacement() {
+        state.isPlacingPad = false;
+        document.getElementById('placing-ui').classList.add('hidden');
+    }
+
+    // SAVE / LOAD
+    function saveGame() {
+        const saveData = { v: 1, r: Math.floor(state.ribbits), t: state.totalInEvo, e: state.evolution, p: state.pads, c: state.clickLv, o: state.totems, m: state.mult, g: state.evoGoal, f: state.myFrogs };
+        const jsonStr = JSON.stringify(saveData);
+        const checksum = jsonStr.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 999999;
+        const finalSave = jsonStr + "|" + checksum;
+        navigator.clipboard.writeText(finalSave).then(() => {
+            const toast = document.getElementById('zen-toast');
+            toast.textContent = "✅ Save copied to clipboard!";
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; toast.textContent = "Double click / double tap anywhere to return home"; }, 3000);
+        });
+    }
+
+    function showLoadModal() {
+        document.getElementById('load-modal').style.display = 'flex';
+        document.getElementById('load-data').focus();
+    }
+
+    function closeLoadModal() {
+        document.getElementById('load-modal').style.display = 'none';
+    }
+
+    function loadGame() {
+        const input = document.getElementById('load-data').value.trim();
+        if (!input) return alert("Please paste something!");
+
+        if (input === "code14") {
+            closeLoadModal();
+            document.getElementById('admin-panel').style.display = 'flex';
+            return;
+        }
+
+        if (input === "[frogo]zelda") {
+            closeLoadModal();
+            const linkFrog = {...ZELDA_FROG, id: Date.now()};
+            state.myFrogs.push(linkFrog);
+            refreshPondFrogs();
+            updateUI();
+            alert("✅ Link the Zelda frog has been added to your pond!");
+            return;
+        }
+
+        // Normal save load
+        try {
+            const parts = input.split("|");
+            if (parts.length !== 2) throw new Error();
+            const jsonStr = parts[0];
+            const provided = parseInt(parts[1]);
+            const calc = jsonStr.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 999999;
+            if (provided !== calc) throw new Error();
+
+            const decoded = JSON.parse(jsonStr);
+            if (decoded.v !== 1) throw new Error();
+
+            resetGameState();
+
+            state.ribbits = decoded.r || 0;
+            state.totalInEvo = decoded.t || 0;
+            state.evolution = decoded.e || 0;
+            state.pads = Math.max(1, decoded.p || 1);
+            state.clickLv = decoded.c || 1;
+            state.totems = decoded.o || 0;
+            state.mult = decoded.m || 1.0;
+            state.evoGoal = decoded.g || 100;
+            state.myFrogs = decoded.f || [];
+
+            const mainCluster = document.getElementById('main-cluster');
+            for (let i = 1; i < state.pads; i++) {
+                if (!document.getElementById(`pad-${i}`)) {
+                    const pad = document.createElement('div');
+                    pad.className = 'lily-pad';
+                    pad.id = `pad-${i}`;
+                    pad.style.left = (15 + Math.random() * 70) + '%';
+                    pad.style.top = (15 + Math.random() * 70) + '%';
+                    pad.onclick = (e) => handlePadInteraction(i, e);
+                    mainCluster.appendChild(pad);
+                }
+            }
+
+            closeLoadModal();
+            refreshPondFrogs();
+            updateUI();
+
+            const toast = document.getElementById('zen-toast');
+            toast.textContent = "✅ Progress loaded successfully!";
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; toast.textContent = "Double click / double tap anywhere to return home"; }, 3000);
+        } catch (e) {
+            alert("Invalid save data!");
+        }
+    }
+
+    function closeAdminPanel() { document.getElementById('admin-panel').style.display = 'none'; }
+
+    function adminAddRibbitsCustom() {
+        const amt = parseFloat(document.getElementById('admin-ribbits').value) || 0;
+        if (amt > 0) gainRibbits(amt);
+    }
+
+    function adminSpawnFrogsCustom() {
+        const count = parseInt(document.getElementById('admin-frogs').value) || 1;
+        for (let i = 0; i < count; i++) {
+            const type = FROG_TYPES[Math.floor(Math.random() * FROG_TYPES.length)];
+            state.myFrogs.push({ id: Date.now() + i, typeId: type.id, name: SPIRIT_NAMES[Math.floor(Math.random() * SPIRIT_NAMES.length)], padIndex: -1 });
+        }
+        updateUI();
+    }
+
+    function adminAddPadsCustom() {
+        const count = parseInt(document.getElementById('admin-pads').value) || 1;
+        for (let i = 0; i < count && state.pads < 12; i++) {
+            const padId = state.pads;
+            const pad = document.createElement('div');
+            pad.className = 'lily-pad';
+            pad.id = `pad-${padId}`;
+            pad.style.left = (15 + Math.random() * 70) + '%';
+            pad.style.top = (15 + Math.random() * 70) + '%';
+            pad.onclick = (e) => handlePadInteraction(padId, e);
+            document.getElementById('main-cluster').appendChild(pad);
+            state.pads++;
+        }
+        updateUI();
+    }
+
+    function adminMaxEvolution() { while (state.evolution < 30) evolve(); }
+    function adminMaxTotems() { state.totems = 50; updateUI(); }
+    function adminMaxClick() { state.clickLv = 30; updateUI(); }
+
+    // Rest of your original functions (handlePadInteraction, spawnWildFrog, initiateCatch, etc.)
+    function handlePadInteraction(padIdx, e) {
+        if (state.zenMode || !state.gameStarted || state.isPlacingPad) return;
+        e.stopPropagation();
+        if (state.placingFrogId !== null) {
+            const frogsOnThisPad = state.myFrogs.filter(f => f.padIndex === padIdx).length;
+            if (frogsOnThisPad < MAX_FROGS_PER_PAD) confirmPlacement(padIdx);
+            else {
+                const el = document.getElementById(`pad-${padIdx}`);
+                el.classList.add('shake');
+                setTimeout(() => el.classList.remove('shake'), 400);
+            }
+            return;
+        }
+        const power = 5 * Math.pow(1.5, state.clickLv - 1) * state.mult;
+        gainRibbits(power);
+        spawnText(e.clientX, e.clientY, `+${Math.floor(power)}`);
+        spawnRipple(e.clientX, e.clientY);
+    }
+
+    function spawnWildFrog(padIdx) {
+        if (!state.gameStarted) return;
+        const pad = document.getElementById(`pad-${padIdx}`);
+        if (!pad || pad.querySelectorAll('.frog-sprite').length > 0) return;
+        const type = FROG_TYPES[Math.floor(Math.random() * FROG_TYPES.length)];
+        const frogEl = document.createElement('div');
+        frogEl.className = 'frog-sprite wild-frog';
+        frogEl.innerHTML = getFrogSVG(type);
+        frogEl.onclick = (e) => { e.stopPropagation(); initiateCatch(type, padIdx); };
+        pad.appendChild(frogEl);
+        pad.dataset.spawning = 'false';
+    }
+
+    function initiateCatch(type, padIdx) {
+        state.currentCatch = { type, padIdx };
+        document.getElementById('catch-display').innerHTML = `<div class="w-32 h-32 mx-auto">${getFrogSVG(type)}</div>`;
+        document.getElementById('catch-name').innerText = type.species;
+        document.getElementById('catch-stats').innerText = `Bonus: ${type.bonusWeather.toUpperCase()} (+${((type.bonusMult - 1) * 100).toFixed(0)}%)`;
+        document.getElementById('frog-name-input').value = "";
+        document.getElementById('catch-modal').style.display = 'flex';
+    }
+
+    function confirmCatch() {
+        const input = document.getElementById('frog-name-input');
+        const inputName = input.value.trim();
+        if (checkProfanity(inputName)) {
+            input.classList.add('input-error');
+            input.value = SPIRIT_NAMES[Math.floor(Math.random() * SPIRIT_NAMES.length)];
+            return;
+        }
+        const finalName = inputName || state.currentCatch.type.species;
+        state.myFrogs.push({ id: Date.now(), typeId: state.currentCatch.type.id, name: finalName, padIndex: -1 });
+        const pad = document.getElementById(`pad-${state.currentCatch.padIdx}`);
+        if (pad) {
+            const wild = pad.querySelector('.wild-frog');
+            if(wild) wild.remove();
+        }
+        document.getElementById('catch-modal').style.display = 'none';
+        state.currentCatch = null;
+        updateUI();
+    }
+
+    function startPlacement(frogId) {
+        state.placingFrogId = frogId;
+        closeFrogMenu();
+        document.querySelectorAll('.lily-pad').forEach((pad, idx) => {
+            const count = state.myFrogs.filter(f => f.padIndex === idx).length;
+            if (count < MAX_FROGS_PER_PAD) pad.classList.add('selectable');
+            else pad.classList.add('is-full');
+        });
+    }
+
+    function confirmPlacement(padIdx) {
+        const frog = state.myFrogs.find(f => f.id === state.placingFrogId);
+        if (frog) {
+            frog.padIndex = padIdx;
+            document.querySelectorAll('.lily-pad').forEach(p => {
+                p.classList.remove('selectable');
+                p.classList.remove('is-full');
+            });
+            state.placingFrogId = null;
+            refreshPondFrogs();
+            updateUI();
+        }
+    }
+
+    function refreshPondFrogs() {
+        document.querySelectorAll('.lily-pad').forEach(p => {
+            const wild = p.querySelector('.wild-frog');
+            p.innerHTML = '';
+            if(wild) p.appendChild(wild);
+        });
+        state.myFrogs.forEach(f => {
+            if (f.padIndex !== -1) {
+                const pad = document.getElementById(`pad-${f.padIndex}`);
+                if (pad) {
+                    const sprite = document.createElement('div');
+                    sprite.className = 'frog-sprite';
+                    sprite.innerHTML = getFrogSVG(FROG_TYPES[f.typeId], f.isZelda);
+                    sprite.title = f.name;
+                    pad.appendChild(sprite);
+                }
+            }
+        });
+    }
+
+    function handleSpiritRealmExit(e) {
+        if (!state.zenMode) return;
+        const now = Date.now();
+        if (now - state.lastTapTime < 280) toggleZen(false);
+        state.lastTapTime = now;
+    }
+
+    function toggleZen(active) {
+        state.zenMode = active;
+        document.body.classList.toggle('zen-active', active);
+        const detector = document.getElementById('zen-exit-detector');
+        if (active) {
+            document.getElementById('zen-toast').style.opacity = '1';
+            setTimeout(() => document.getElementById('zen-toast').style.opacity = '0', 2800);
+            startZenEcosystem();
+            detector.ondblclick = handleSpiritRealmExit;
+            detector.ontouchstart = handleSpiritRealmExit;
+        } else {
+            stopZenEcosystem();
+            refreshPondFrogs();
+            detector.ondblclick = null;
+            detector.ontouchstart = null;
+        }
+        updateUI();
+    }
+
+    function startZenEcosystem() { state.zenMult = 2.0; randomizeWeather(); }
+    function stopZenEcosystem() { state.zenMult = 1.0; state.weather = 'idle'; document.getElementById('weather-icon').innerText = '☀️'; }
 
     function randomizeWeather() {
         const types = ['idle', 'rain', 'snow'];
         state.weather = types[Math.floor(Math.random() * types.length)];
-        const fx = document.getElementById('fx-layer'); 
-        fx.innerHTML = '';
+        const fx = document.getElementById('fx-layer'); fx.innerHTML = '';
         const icon = document.getElementById('weather-icon');
-
         if (state.weather === 'rain') {
             icon.innerText = '🌧️';
-            for(let i = 0; i < 160; i++) {  // Heavy rain
-                const d = document.createElement('div');
-                d.className = 'rain-drop';
-                d.style.left = Math.random() * 100 + 'vw';
-                d.style.animationDelay = '-' + (Math.random() * 0.8) + 's';
-                d.style.opacity = 0.55 + Math.random() * 0.4;
-                d.style.height = (35 + Math.random() * 40) + 'px';
+            for(let i=0; i<40; i++) {
+                const d = document.createElement('div'); d.className = 'rain-drop';
+                d.style.left = Math.random() * 100 + 'vw'; d.style.animationDelay = Math.random() + 's';
                 fx.appendChild(d);
             }
         } else if (state.weather === 'snow') {
             icon.innerText = '❄️';
             for(let i=0; i<30; i++) {
-                const f = document.createElement('div'); 
-                f.className = 'snow-flake';
-                const s = 4 + Math.random()*6; 
-                f.style.width = s+'px'; 
-                f.style.height = s+'px';
-                f.style.left = Math.random()*100+'vw'; 
-                f.style.animationDelay = Math.random()*3+'s';
+                const f = document.createElement('div'); f.className = 'snow-flake';
+                const s = 4 + Math.random()*6; f.style.width = s+'px'; f.style.height = s+'px';
+                f.style.left = Math.random()*100+'vw'; f.style.animationDelay = Math.random()*3+'s';
                 fx.appendChild(f);
             }
-        } else { 
-            icon.innerText = '☀️'; 
-        }
+        } else { icon.innerText = '☀️'; }
     }
-
-    // ... [Rest of your original script remains unchanged from spawnSpiritBurst onward] ...
 
     function spawnSpiritBurst() {
         for(let i=0; i<15; i++) {
@@ -483,6 +924,7 @@
         }
     }
 
+    // NERFED PASSIVE INCOME
     setInterval(() => {
         if (!state.gameStarted) return;
         let passive = state.totems * 8;
