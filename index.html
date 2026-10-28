@@ -1,9 +1,10 @@
+```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimum-scale=1.0">
-    <title>Frogfriends</title>
+    <title>Frogfriends - Cozy Pond & Greenhouse DLC</title>
     <link rel="icon" type="image/png" href="favicon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -15,7 +16,11 @@
             --accent: #fde047;
             --celestial-top: #1e293b;
             --celestial-bottom: #0f172a;
+            --gh-top: #2dd4bf;
+            --gh-bottom: #065f46;
+            --gh-accent: #a7f3d0;
         }
+
         body {
             margin: 0;
             overflow: hidden;
@@ -25,53 +30,110 @@
             touch-action: none;
             color: white;
         }
+
+        /* TITLE SCREEN */
         #title-screen {
             position: fixed; inset: 0; z-index: 10000;
             background: linear-gradient(to bottom, #a7f3d0, #4fac82);
             display: flex; flex-direction: column; justify-content: center; align-items: center;
             transition: opacity 1.5s ease-out, transform 1.5s ease-out;
+            pointer-events: auto;
         }
         .title-container { text-align: center; animation: float-title 4s ease-in-out infinite; }
         .main-title { font-size: 6rem; font-weight: 700; color: white; text-shadow: 0 8px 0px rgba(0,0,0,0.1); line-height: 0.8; margin-bottom: 10px; }
         .sub-title {
             color: #fde047; font-size: 1.8rem; font-weight: 700;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 40px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2); margin-bottom: 30px;
             animation: pulse-text 3s ease-in-out infinite; display: inline-block;
         }
         @keyframes pulse-text { 0%,100% { transform: scale(1); opacity: 0.9; } 50% { transform: scale(1.15); opacity: 1; } }
         @keyframes float-title { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        
         .start-btn {
             background: white; color: #4fac82; padding: 15px 50px; border-radius: 100px;
             font-size: 2rem; font-weight: 700; cursor: pointer; box-shadow: 0 10px 0px #3d8a68;
-            transition: all 0.2s; margin-top: 20px;
+            transition: all 0.2s; margin-top: 10px; border: none; pointer-events: auto; z-index: 10001;
         }
         .start-btn:hover { transform: translateY(-3px); box-shadow: 0 13px 0px #3d8a68; }
         .start-btn:active { transform: translateY(5px); box-shadow: 0 0px 0px #3d8a68; }
 
+        /* POND CONTAINER & THEMES */
         #pond-container {
             position: relative; width: 100vw; height: 100vh;
             background: linear-gradient(to bottom, var(--bg-top) 0%, var(--bg-bottom) 100%);
-            overflow: hidden; transition: background 4s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer; opacity: 0;
-            touch-action: none;
+            overflow: hidden; transition: background 2s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer; opacity: 0; touch-action: none;
         }
         #pond-container.visible { opacity: 1; }
+
+        body.theme-greenhouse #pond-container {
+            background: radial-gradient(circle at 50% 30%, #34d399 0%, #059669 40%, #022c22 100%) !important;
+        }
+
+        #greenhouse-overlay {
+            position: absolute; inset: 0; pointer-events: none; z-index: 4; opacity: 0;
+            transition: opacity 1.5s ease;
+            background: 
+                linear-gradient(135deg, rgba(255,255,255,0.15) 0%, transparent 40%),
+                linear-gradient(225deg, rgba(255,255,255,0.1) 0%, transparent 35%);
+            box-shadow: inset 0 0 100px rgba(0,20,10,0.6);
+        }
+        body.theme-greenhouse #greenhouse-overlay { opacity: 1; }
+
+        .sunbeam {
+            position: absolute; top: -20%; width: 120px; height: 140vh;
+            background: linear-gradient(to bottom, rgba(253, 224, 71, 0.25), rgba(255,255,255,0));
+            transform: rotate(-25deg); pointer-events: none; filter: blur(15px);
+            animation: beam-shine 8s ease-in-out infinite alternate;
+        }
+        @keyframes beam-shine { 0% { opacity: 0.3; } 100% { opacity: 0.8; } }
+
         body.zen-active #pond-container {
             background: linear-gradient(to bottom, var(--celestial-top) 0%, var(--celestial-bottom) 100%) !important;
         }
         #zen-exit-detector { position: fixed; inset: 0; z-index: 9999; display: none; cursor: zoom-out; }
         body.zen-active #zen-exit-detector { display: block; }
 
-        #fx-layer, #fish-layer, #spirit-layer { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+        #fx-layer, #fish-layer, #spirit-layer, #botanical-layer { position: absolute; inset: 0; pointer-events: none; z-index: 5; }
+
         .rain-drop { position: absolute; background: rgba(255,255,255,0.4); width: 1px; height: 20px; pointer-events: none; animation: rain-fall 0.8s linear infinite; }
         @keyframes rain-fall { to { transform: translateY(100vh); } }
         .snow-flake { position: absolute; background: white; border-radius: 50%; pointer-events: none; animation: snow-fall 3s linear infinite; }
         @keyframes snow-fall { to { transform: translateY(100vh) rotate(360deg); } }
+        
+        .mist-spore {
+            position: absolute; background: rgba(209, 250, 229, 0.6); border-radius: 50%; pointer-events: none;
+            filter: blur(2px); animation: spore-float 6s ease-in-out infinite alternate;
+        }
+        @keyframes spore-float { 0% { transform: translateY(0) scale(0.8); opacity: 0.2; } 100% { transform: translateY(-40px) scale(1.2); opacity: 0.7; } }
+
+        .falling-leaf {
+            position: absolute; width: 14px; height: 14px; background: #34d399;
+            border-radius: 0% 100% 50% 100%; pointer-events: none; opacity: 0.7;
+            animation: leaf-fall 7s linear infinite;
+        }
+        @keyframes leaf-fall { 0% { transform: translateY(-20px) rotate(0deg); } 100% { transform: translateY(105vh) rotate(360deg); } }
+
         .spirit-orb {
             position: absolute; width: 8px; height: 8px; background: white; border-radius: 50%;
             filter: blur(4px); box-shadow: 0 0 10px rgba(255,255,255,0.8); animation: drift 10s linear infinite; opacity: 0.6;
         }
         @keyframes drift { 0% { transform: translateY(0) translateX(0); opacity: 0; } 20% { opacity: 0.6; } 100% { transform: translateY(-100vh) translateX(50px); opacity: 0; } }
+
+        .spirit-koi {
+            position: absolute;
+            pointer-events: none;
+            filter: drop-shadow(0 0 8px rgba(253, 224, 71, 0.6));
+            opacity: 0.75;
+            animation: swim-koi linear infinite;
+        }
+        @keyframes swim-koi {
+            0% { transform: translateX(-150px) translateY(0) scaleX(1); }
+            49% { transform: translateX(calc(100vw + 150px)) translateY(-60px) scaleX(1); }
+            50% { transform: translateX(calc(100vw + 150px)) translateY(-60px) scaleX(-1); }
+            99% { transform: translateX(-150px) translateY(40px) scaleX(-1); }
+            100% { transform: translateX(-150px) translateY(0) scaleX(1); }
+        }
 
         .ui-root { position: absolute; inset: 0; pointer-events: none; z-index: 100; }
         .ui-root > * { pointer-events: auto; }
@@ -79,45 +141,68 @@
         .zen-active .ui-element { opacity: 0 !important; pointer-events: none !important; transform: scale(0.9) translateY(20px); }
 
         .ui-panel {
-            background: rgba(255,255,255,0.15); backdrop-filter: blur(16px); border-radius: 40px;
-            border: 1px solid rgba(255,255,255,0.3); padding: 20px; display: flex; gap: 12px;
-            box-shadow: 0 15px 45px rgba(0,0,0,0.15);
+            background: rgba(255,255,255,0.2); backdrop-filter: blur(16px); border-radius: 40px;
+            border: 1px solid rgba(255,255,255,0.35); padding: 16px; display: flex; gap: 10px;
+            box-shadow: 0 15px 45px rgba(0,0,0,0.15); flex-wrap: wrap; justify-content: center;
+            pointer-events: auto;
         }
         .pill-btn {
             background: #76d4a5; border-radius: 20px; padding: 8px; color: white; font-weight: bold;
-            border: none; box-shadow: 0 4px 0px #459470; transition: all 0.1s; width: 115px; min-height: 75px;
+            border: none; box-shadow: 0 4px 0px #459470; transition: all 0.1s; width: 105px; min-height: 70px;
             display: flex; flex-direction: column; justify-content: center; align-items: center;
-            cursor: pointer; text-align: center; line-height: 1.1;
+            cursor: pointer; text-align: center; line-height: 1.1; font-size: 1.1rem; pointer-events: auto;
         }
         .pill-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 6px 0px #459470; }
         .pill-btn:active:not(:disabled) { transform: translateY(2px); box-shadow: 0 0px 0px #459470; }
-        .pill-btn:disabled { opacity: 0.4; filter: grayscale(1); }
+        .pill-btn:disabled { opacity: 0.4; filter: grayscale(1); pointer-events: none; }
+
+        .dlc-btn {
+            background: linear-gradient(135deg, #10b981 0%, #047857 100%);
+            border: 2px solid #fde047; box-shadow: 0 4px 0px #064e3b;
+        }
+        .dlc-btn:hover:not(:disabled) { box-shadow: 0 6px 0px #064e3b; }
 
         .lily-pad {
             width: 120px; height: 100px; background: #62b88e; border-radius: 45% 55% 50% 50% / 50% 50% 55% 45%;
             box-shadow: inset 0 -5px 15px rgba(0,0,0,0.15), 0 12px 24px rgba(0,0,0,0.1);
             cursor: pointer; animation: bobbing 5s ease-in-out infinite; position: absolute;
             display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 2px;
-            padding: 10px; z-index: 20; transition: all 0.3s;
+            padding: 10px; z-index: 20; transition: background 1s, border-radius 1s, transform 0.3s;
+            pointer-events: auto;
         }
         .lily-pad.selectable { outline: 4px dashed #fde047; outline-offset: 8px; transform: scale(1.1); z-index: 50; }
         .lily-pad.is-full { filter: grayscale(0.5) contrast(0.8); cursor: not-allowed; }
         .lily-pad.shake { animation: shake 0.4s ease-in-out; outline: 4px solid #ef4444 !important; }
+
+        body.theme-greenhouse .lily-pad {
+            background: radial-gradient(circle, #047857 0%, #065f46 60%, #78350f 100%);
+            border: 3px solid #f59e0b; border-radius: 50%;
+            box-shadow: inset 0 0 15px rgba(0,0,0,0.4), 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        .placed-decor {
+            position: absolute; width: 45px; height: 45px; cursor: pointer;
+            z-index: 25; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+            transition: transform 0.2s; pointer-events: auto;
+        }
+        .placed-decor:hover { transform: scale(1.2); }
+
         @keyframes shake { 0%,100% { transform: translateX(0) scale(1.1); } 25% { transform: translateX(-5px) scale(1.1); } 75% { transform: translateX(5px) scale(1.1); } }
         @keyframes bobbing { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        .frog-sprite { width: 35px; height: 35px; cursor: pointer; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)); transition: transform 0.2s; }
-        .frog-sprite:hover { transform: scale(1.2); }
+        .frog-sprite { width: 35px; height: 35px; cursor: pointer; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)); transition: transform 0.2s; pointer-events: auto; }
+        .frog-sprite:hover { transform: scale(1.25); }
         .wild-frog { animation: hop-wild 2s ease-in-out infinite; }
         @keyframes hop-wild { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1) translateY(-5px); } }
 
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
-            z-index: 2000; display: none; justify-content: center; align-items: center;
+            z-index: 2000; display: none; justify-content: center; align-items: center; pointer-events: auto;
         }
         .modal-content, .admin-panel {
             background: #4fac82; border: 4px solid #fde047; border-radius: 30px;
-            padding: 30px; max-width: 520px; width: 90%; text-align: center;
+            padding: 28px; max-width: 580px; width: 92%; text-align: center;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); pointer-events: auto;
         }
         .admin-panel { background: #1e2937; }
 
@@ -129,94 +214,128 @@
 
         #zen-toast {
             position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: rgba(0,0,0,0.5); padding: 10px 20px; border-radius: 100px;
-            pointer-events: none; opacity: 0; transition: opacity 1s; z-index: 10001;
-            font-size: 0.9rem; color: white;
+            background: rgba(0,0,0,0.7); padding: 10px 24px; border-radius: 100px;
+            pointer-events: none; opacity: 0; transition: opacity 0.8s; z-index: 10001;
+            font-size: 1rem; color: white; border: 1px solid rgba(255,255,255,0.2);
         }
         .fullscreen-btn {
             position: fixed; top: 20px; left: 20px; width: 45px; height: 45px;
             background: rgba(255,255,255,0.2); backdrop-filter: blur(10px);
             border: 1px solid rgba(255,255,255,0.4); border-radius: 12px;
             display: flex; align-items: center; justify-content: center;
-            cursor: pointer; z-index: 5000; color: white; transition: all 0.2s;
+            cursor: pointer; z-index: 5000; color: white; transition: all 0.2s; pointer-events: auto;
         }
         .input-error { border-color: #ef4444 !important; animation: shake 0.3s; }
         .save-btn { background: #facc15; color: #1e2937; font-weight: bold; }
+        
+        .badge-unlocked {
+            background: #10b981; color: white; font-size: 0.75rem; padding: 2px 8px; border-radius: 9999px; text-transform: uppercase; letter-spacing: 1px;
+        }
+
+        .botanical-item {
+            background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(52, 211, 153, 0.3);
+            border-radius: 16px; padding: 12px; display: flex; align-items: center; gap: 12px;
+            transition: all 0.2s; pointer-events: auto;
+        }
+        .botanical-item:hover { background: rgba(16, 185, 129, 0.25); border-color: rgba(52, 211, 153, 0.6); }
     </style>
 </head>
 <body>
+
+<!-- TITLE SCREEN -->
 <div id="title-screen">
     <div class="title-container">
         <h1 class="main-title">Frogfriends</h1>
         <div id="random-subtitle" class="sub-title">Totoro-lly awesome!</div>
         <br>
-        <button class="start-btn" onclick="startGame()">Start Journey</button>
+        <button id="start-journey-btn" class="start-btn" onclick="startGame()">Start Journey</button>
     </div>
     <div class="absolute inset-0 pointer-events-none opacity-40 overflow-hidden" id="title-deco"></div>
 </div>
 
 <div id="zen-exit-detector"></div>
 
+<!-- MAIN POND / GREENHOUSE CONTAINER -->
 <div id="pond-container" onclick="handlePondClick(event)">
+    <div id="greenhouse-overlay">
+        <div class="sunbeam" style="left: 15%;"></div>
+        <div class="sunbeam" style="left: 55%;"></div>
+    </div>
     <div id="fx-layer"></div>
+    <div id="botanical-layer"></div>
     <div id="fish-layer"></div>
     <div id="spirit-layer"></div>
-    <div id="game-center" class="absolute inset-0">
-        <div id="main-cluster" class="relative w-full h-full">
+
+    <div id="game-center" class="absolute inset-0 pointer-events-none">
+        <div id="main-cluster" class="relative w-full h-full pointer-events-none">
             <div class="lily-pad" id="pad-0" onclick="handlePadInteraction(0, event)" style="left: calc(50% - 60px); top: calc(50% - 50px);"></div>
         </div>
     </div>
-    <div id="ui-wrapper">
+
+    <div id="ui-wrapper" class="pointer-events-none">
         <button class="fullscreen-btn ui-element" onclick="toggleFullscreen()" title="Toggle Fullscreen">
             <svg id="fs-icon" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>
             </svg>
         </button>
 
+        <!-- PLACING UI -->
         <div id="placing-ui" class="fixed top-5 left-1/2 -translate-x-1/2 bg-black/80 px-8 py-4 rounded-3xl border-2 border-yellow-400 z-[3000] text-center hidden pointer-events-auto">
-            <div class="text-xl font-bold text-yellow-300">PLACE NEW LILY PAD</div>
-            <div class="text-sm opacity-80">Click anywhere on the pond (away from UI)</div>
-            <button onclick="cancelPlacement()" class="mt-3 text-xs bg-red-500 px-6 py-2 rounded-full">Cancel</button>
+            <div class="text-xl font-bold text-yellow-300" id="place-pad-text">PLACE NEW LILY PAD</div>
+            <div class="text-sm opacity-80">Click anywhere on the scene (away from UI)</div>
+            <button onclick="cancelPlacement()" class="mt-3 text-xs bg-red-500 px-6 py-2 rounded-full cursor-pointer pointer-events-auto">Cancel</button>
+        </div>
+
+        <div id="decor-placing-ui" class="fixed top-5 left-1/2 -translate-x-1/2 bg-black/80 px-8 py-4 rounded-3xl border-2 border-yellow-400 z-[3000] text-center hidden pointer-events-auto">
+            <div class="text-xl font-bold text-yellow-300" id="place-decor-title">PLACE DECORATION</div>
+            <div class="text-sm opacity-80">Click anywhere on the pond to place this item</div>
+            <button onclick="cancelDecorPlacement()" class="mt-3 text-xs bg-red-500 px-6 py-2 rounded-full cursor-pointer pointer-events-auto">Cancel</button>
         </div>
 
         <div id="zen-toast">Double click / double tap anywhere to return home</div>
 
+        <!-- MAIN HUD -->
         <div class="ui-root">
-            <div class="absolute top-10 left-20 ui-element">
+            <!-- TOP LEFT: SCORE & LOCATION -->
+            <div class="absolute top-8 left-20 ui-element">
                 <div class="flex items-baseline gap-3">
                     <span class="text-7xl font-bold drop-shadow-lg" id="score">0</span>
                     <span class="text-2xl text-yellow-300 font-bold" id="multiplier">x1.0</span>
                 </div>
-                <div class="text-xl opacity-80 uppercase tracking-widest flex items-center gap-2">
+                <div class="text-xl opacity-90 uppercase tracking-widest flex items-center gap-2">
                     <span id="evo-name">Morning Marsh</span>
                     <span id="weather-icon">☀️</span>
+                    <span id="theme-badge" class="badge-unlocked hidden">Greenhouse</span>
                 </div>
-                <div id="evo-desc" class="text-xs opacity-60 max-w-xs italic leading-tight mt-1">A quiet, humble beginning.</div>
+                <div id="evo-desc" class="text-xs opacity-75 max-w-xs italic leading-tight mt-1">A quiet, humble beginning.</div>
             </div>
 
-            <div class="absolute top-10 right-10 flex flex-col items-end ui-element">
-                <div class="text-[10px] font-bold opacity-70 mb-1 tracking-widest uppercase">Pond Ascension Level: <span id="evo-level">0</span></div>
+            <!-- TOP RIGHT: ASCENSION BAR -->
+            <div class="absolute top-8 right-10 flex flex-col items-end ui-element">
+                <div class="text-[11px] font-bold opacity-80 mb-1 tracking-widest uppercase">Pond Ascension Level: <span id="evo-level">0</span></div>
                 <div class="w-64 h-3 bg-black/30 rounded-full overflow-hidden border border-white/20">
                     <div id="evo-bar" class="h-full bg-gradient-to-r from-yellow-200 to-yellow-500 transition-all duration-700" style="width: 0%"></div>
                 </div>
                 <div class="text-xs mt-1 font-bold" id="evo-goal">Goal: 100</div>
             </div>
 
-            <div class="absolute top-40 right-10 ui-element">
-                <button onclick="toggleZen(true)" class="group bg-white/10 hover:bg-white/20 px-8 py-4 rounded-full border border-white/30 text-lg backdrop-blur-xl transition-all flex items-center gap-3">
+            <!-- SPIRIT REALM TRIGGER -->
+            <div class="absolute top-36 right-10 ui-element">
+                <button onclick="toggleZen(true)" class="group bg-white/10 hover:bg-white/20 px-6 py-3 rounded-full border border-white/30 text-lg backdrop-blur-xl transition-all flex items-center gap-3 cursor-pointer pointer-events-auto">
                     <span class="text-2xl animate-pulse">✨</span>
-                    Enter Spirit Realm
+                    Spirit Realm
                 </button>
             </div>
 
-            <div class="absolute bottom-10 left-1/2 -translate-x-1/2 ui-element">
+            <!-- BOTTOM NAVIGATION BAR -->
+            <div class="absolute bottom-6 left-1/2 -translate-x-1/2 ui-element">
                 <div class="ui-panel">
                     <button id="btn-add-pad" class="pill-btn" onclick="buyPad()">
-                        <span>New Pad</span>
+                        <span>Lily Pad</span>
                         <span class="text-xs mt-1" id="cost-pad">150</span>
                     </button>
                     <button id="btn-friend" class="pill-btn" onclick="openFrogMenu()">
-                        <span>Frog Menu</span>
+                        <span>Compendium</span>
                         <span class="text-xs mt-1" id="frog-count">Owned: 0</span>
                     </button>
                     <button id="btn-click" class="pill-btn" onclick="buyClick()">
@@ -227,11 +346,15 @@
                         <span>Ancient Totem</span>
                         <span class="text-xs mt-1" id="cost-totem">5,000</span>
                     </button>
-                    <button onclick="saveGame()" class="pill-btn save-btn">
-                        <span>Save Game</span>
+                    <button id="btn-dlc-store" class="pill-btn dlc-btn" onclick="openDLCModal()">
+                        <span>🪴 DLC Store</span>
+                        <span class="text-xs mt-1 text-yellow-300" id="dlc-btn-status">Greenhouse</span>
                     </button>
-                    <button onclick="showLoadModal()" class="pill-btn save-btn">
-                        <span>Load Game</span>
+                    <button onclick="saveGame()" class="pill-btn save-btn cursor-pointer">
+                        <span>Save</span>
+                    </button>
+                    <button onclick="showLoadModal()" class="pill-btn save-btn cursor-pointer">
+                        <span>Load</span>
                     </button>
                 </div>
             </div>
@@ -239,92 +362,228 @@
     </div>
 </div>
 
-<!-- Load Modal -->
-<div id="load-modal" class="modal-overlay">
-    <div class="modal-content">
-        <h2 class="text-3xl font-bold mb-4">Load Game</h2>
-        <p class="text-yellow-200 mb-4 text-sm">This will completely wipe your current progress.</p>
-        <textarea id="load-data" rows="6" class="w-full bg-black/30 border border-white/30 rounded-2xl p-4 text-white text-sm font-mono resize-none" placeholder="Paste your saved game data here..."></textarea>
-        <div class="flex gap-3 mt-6">
-            <button onclick="closeLoadModal()" class="flex-1 py-4 bg-gray-600 rounded-2xl font-bold">Cancel</button>
-            <button onclick="loadGame()" class="flex-1 py-4 bg-yellow-400 text-green-900 font-bold rounded-2xl">Load & Wipe Current Progress</button>
+<!-- DLC EXPANSION STORE MODAL -->
+<div id="dlc-modal" class="modal-overlay">
+    <div class="modal-content !max-w-xl text-left">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-3xl font-bold text-yellow-300 flex items-center gap-2">
+                <span>🪴</span> Greenhouse DLC Sanctuary
+            </h2>
+            <button onclick="closeDLCModal()" class="text-3xl opacity-60 hover:opacity-100 cursor-pointer">&times;</button>
+        </div>
+
+        <div class="bg-black/30 rounded-2xl p-4 mb-4 border border-emerald-400/30">
+            <p class="text-sm text-emerald-100 mb-2">
+                Transform your peaceful marsh into a lush, sunlit botanical sanctuary! Includes misty glass aesthetics, warm sunbeams, terrarium lily pads, and <strong>5 exclusive Botanical Frog Spirits</strong>.
+            </p>
+            <div id="dlc-ownership-status" class="mt-2 text-xs font-bold uppercase tracking-wider text-yellow-300">
+                Status: Locked
+            </div>
+        </div>
+
+        <!-- UNLOCK / ACTIVATION SECTION -->
+        <div id="dlc-lock-section" class="space-y-4 mb-6">
+            <div class="bg-emerald-950/40 p-4 rounded-xl border border-emerald-500/20">
+                <label class="block text-xs uppercase opacity-80 mb-1 text-emerald-200">Enter License Key</label>
+                <div class="flex gap-2">
+                    <input type="text" id="dlc-key-input" class="flex-1 bg-black/40 border border-emerald-400/40 rounded-xl p-3 text-white text-center font-mono text-sm uppercase" placeholder="e.g. GREENHOUSE2026">
+                    <button onclick="activateDLCKey()" class="bg-yellow-400 text-emerald-950 font-bold px-6 rounded-xl hover:bg-yellow-300 transition-colors cursor-pointer pointer-events-auto">Activate</button>
+                </div>
+                <div id="secret-codes-display" class="text-[11px] text-yellow-300 mt-2 italic hidden">
+                    Secret Codes: code14, ARTHUR28, UAREGAY, Lebron92, dlccode, zelda
+                </div>
+            </div>
+        </div>
+
+        <!-- UNLOCKED THEME & PERKS SECTION -->
+        <div id="dlc-active-section" class="space-y-4 mb-6 hidden">
+            <div class="bg-emerald-800/40 p-4 rounded-xl border border-emerald-300/40 flex items-center justify-between">
+                <div>
+                    <div class="font-bold text-lg text-white">Greenhouse Environment</div>
+                    <div class="text-xs text-emerald-200">Switch environment theme active in-game.</div>
+                </div>
+                <button id="toggle-theme-btn" onclick="toggleGreenhouseTheme()" class="bg-yellow-400 text-emerald-950 font-bold px-6 py-3 rounded-xl hover:bg-yellow-300 transition-all cursor-pointer pointer-events-auto">
+                    Enable Greenhouse
+                </button>
+            </div>
+
+            <!-- BOTANICAL TERRARIUM PERKS & DECORATIONS -->
+            <div class="text-sm font-bold text-yellow-300 uppercase tracking-wider mt-4 mb-2">Botanical Terrarium & Decor Shop</div>
+            <div class="grid grid-cols-1 gap-3 max-h-[220px] overflow-y-auto pr-1">
+                <div class="botanical-item">
+                    <div class="text-3xl">🏮</div>
+                    <div class="flex-1">
+                        <div class="font-bold text-white text-base">Terrarium Lantern Spirit</div>
+                        <div class="text-xs text-emerald-200">Adds +25 Ribbits/sec passive glow. Placeable.</div>
+                    </div>
+                    <button onclick="buyGreenhousePerk('lantern', 1500)" class="bg-yellow-400 text-emerald-950 font-bold px-4 py-2 rounded-xl text-xs hover:bg-yellow-300 cursor-pointer pointer-events-auto">1,500 🐸</button>
+                </div>
+                <div class="botanical-item">
+                    <div class="text-3xl">🗿</div>
+                    <div class="flex-1">
+                        <div class="font-bold text-white text-base">Classic Stone Lantern</div>
+                        <div class="text-xs text-emerald-200">Adds +40 Ribbits/sec passive glow. Placeable.</div>
+                    </div>
+                    <button onclick="buyGreenhousePerk('stonelantern', 3000)" class="bg-yellow-400 text-emerald-950 font-bold px-4 py-2 rounded-xl text-xs hover:bg-yellow-300 cursor-pointer pointer-events-auto">3,000 🐸</button>
+                </div>
+                <div class="botanical-item">
+                    <div class="text-3xl">🪨</div>
+                    <div class="flex-1">
+                        <div class="font-bold text-white text-base">Zen Garden Rock Stack</div>
+                        <div class="text-xs text-emerald-200">Brings meditative calm, adding +60 Ribbits/sec. Placeable.</div>
+                    </div>
+                    <button onclick="buyGreenhousePerk('rockstack', 6000)" class="bg-yellow-400 text-emerald-950 font-bold px-4 py-2 rounded-xl text-xs hover:bg-yellow-300 cursor-pointer pointer-events-auto">6k 🐸</button>
+                </div>
+                <div class="botanical-item">
+                    <div class="text-3xl">🎐</div>
+                    <div class="flex-1">
+                        <div class="font-bold text-white text-base">Bamboo Wind Chime</div>
+                        <div class="text-xs text-emerald-200">Soothing breeze, adding +100 Ribbits/sec. Placeable.</div>
+                    </div>
+                    <button onclick="buyGreenhousePerk('windchime', 12000)" class="bg-yellow-400 text-emerald-950 font-bold px-4 py-2 rounded-xl text-xs hover:bg-yellow-300 cursor-pointer pointer-events-auto">12k 🐸</button>
+                </div>
+                <div class="botanical-item">
+                    <div class="text-3xl">🌸</div>
+                    <div class="flex-1">
+                        <div class="font-bold text-white text-base">Rare Orchid Bloom</div>
+                        <div class="text-xs text-emerald-200">Increases click power multiplier by +0.5x permanently.</div>
+                    </div>
+                    <button onclick="buyGreenhousePerk('orchid', 10000)" id="perk-btn-orchid" class="bg-yellow-400 text-emerald-950 font-bold px-4 py-2 rounded-xl text-xs hover:bg-yellow-300 cursor-pointer pointer-events-auto">10k 🐸</button>
+                </div>
+                <div class="botanical-item">
+                    <div class="text-3xl">💧</div>
+                    <div class="flex-1">
+                        <div class="font-bold text-white text-base">Automatic Misting System</div>
+                        <div class="text-xs text-emerald-200">Doubles chance of rare botanical frog visitors spawning.</div>
+                    </div>
+                    <button onclick="buyGreenhousePerk('mister', 25000)" id="perk-btn-mister" class="bg-yellow-400 text-emerald-950 font-bold px-4 py-2 rounded-xl text-xs hover:bg-yellow-300 cursor-pointer pointer-events-auto">25k 🐸</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex justify-end">
+            <button onclick="closeDLCModal()" class="px-6 py-3 bg-gray-600 rounded-xl font-bold cursor-pointer pointer-events-auto">Close</button>
         </div>
     </div>
 </div>
 
-<!-- ADMIN PANEL (Updated with inputs) -->
-<div id="admin-pane" class="modal-overlay" style="display: none;">
+<!-- LOAD MODAL -->
+<div id="load-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h2 class="text-3xl font-bold mb-4">Load Game</h2>
+        <p class="text-yellow-200 mb-4 text-sm">Paste your saved game code below to restore your pond.</p>
+        <textarea id="load-data" rows="5" class="w-full bg-black/30 border border-white/30 rounded-2xl p-4 text-white text-sm font-mono resize-none" placeholder="Paste your saved game data here..."></textarea>
+        <div class="flex gap-3 mt-6">
+            <button onclick="closeLoadModal()" class="flex-1 py-3 bg-gray-600 rounded-2xl font-bold cursor-pointer pointer-events-auto">Cancel</button>
+            <button onclick="loadGame()" class="flex-1 py-3 bg-yellow-400 text-green-900 font-bold rounded-2xl cursor-pointer pointer-events-auto">Load & Restore Progress</button>
+        </div>
+    </div>
+</div>
+
+<!-- ADMIN PANEL -->
+<div id="admin-panel" class="modal-overlay" style="display: none;">
     <div class="admin-panel">
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-3xl font-bold text-yellow-300">🐸 FROGO ADMIN PANEL 🐸</h2>
-            <button onclick="closeAdminPanel()" class="text-4xl opacity-70 hover:opacity-100">&times;</button>
+            <button onclick="closeAdminPanel()" class="text-4xl opacity-70 hover:opacity-100 cursor-pointer">&times;</button>
         </div>
-        <div class="space-y-6 text-left">
+        <div class="space-y-4 text-left">
             <div>
                 <label class="block text-sm mb-1">Add Ribbits</label>
                 <div class="flex gap-2">
                     <input id="admin-ribbits" type="number" value="100000" class="flex-1 bg-black/40 border border-white/30 rounded-xl p-3 text-white">
-                    <button onclick="adminAddRibbitsCustom()" class="bg-green-600 hover:bg-green-500 px-6 rounded-xl font-bold">Add</button>
+                    <button onclick="adminAddRibbitsCustom()" class="bg-green-600 hover:bg-green-500 px-6 rounded-xl font-bold cursor-pointer pointer-events-auto">Add</button>
                 </div>
             </div>
             <div>
                 <label class="block text-sm mb-1">Spawn Frogs</label>
                 <div class="flex gap-2">
                     <input id="admin-frogs" type="number" value="10" class="flex-1 bg-black/40 border border-white/30 rounded-xl p-3 text-white">
-                    <button onclick="adminSpawnFrogsCustom()" class="bg-purple-600 hover:bg-purple-500 px-6 rounded-xl font-bold">Spawn</button>
+                    <button onclick="adminSpawnFrogsCustom()" class="bg-purple-600 hover:bg-purple-500 px-6 rounded-xl font-bold cursor-pointer pointer-events-auto">Spawn</button>
                 </div>
             </div>
             <div>
-                <label class="block text-sm mb-1">Add Lily Pads</label>
+                <label class="block text-sm mb-1">Add Lily Pads / Spots</label>
                 <div class="flex gap-2">
                     <input id="admin-pads" type="number" value="3" class="flex-1 bg-black/40 border border-white/30 rounded-xl p-3 text-white" max="11">
-                    <button onclick="adminAddPadsCustom()" class="bg-blue-600 hover:bg-blue-500 px-6 rounded-xl font-bold">Add</button>
+                    <button onclick="adminAddPadsCustom()" class="bg-blue-600 hover:bg-blue-500 px-6 rounded-xl font-bold cursor-pointer pointer-events-auto">Add</button>
                 </div>
             </div>
-            <div class="grid grid-cols-2 gap-4">
-                <button onclick="adminMaxEvolution()" class="bg-orange-600 hover:bg-orange-500 py-3 rounded-2xl font-bold">Max Evolution</button>
-                <button onclick="adminMaxTotems()" class="bg-red-600 hover:bg-red-500 py-3 rounded-2xl font-bold">Max Totems</button>
-                <button onclick="adminMaxClick()" class="bg-red-600 hover:bg-red-500 py-3 rounded-2xl font-bold">Max Click Power</button>
-                <button onclick="closeAdminPanel()" class="bg-gray-600 hover:bg-gray-500 py-3 rounded-2xl font-bold">Close</button>
+            <div class="grid grid-cols-2 gap-3 pt-2">
+                <button onclick="adminMaxEvolution()" class="bg-orange-600 hover:bg-orange-500 py-3 rounded-2xl font-bold cursor-pointer pointer-events-auto">Max Evolution</button>
+                <button onclick="adminMaxTotems()" class="bg-red-600 hover:bg-red-500 py-3 rounded-2xl font-bold cursor-pointer pointer-events-auto">Max Totems</button>
+                <button onclick="adminMaxClick()" class="bg-emerald-600 hover:bg-emerald-500 py-3 rounded-2xl font-bold cursor-pointer pointer-events-auto">Max Click Power</button>
+                <button onclick="adminUnlockDLC()" class="bg-yellow-500 text-green-950 py-3 rounded-2xl font-bold cursor-pointer pointer-events-auto">Unlock DLC</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Catch Modal -->
+<!-- CATCH MODAL -->
 <div id="catch-modal" class="modal-overlay">
     <div class="modal-content">
-        <div id="catch-display" class="mb-6"></div>
-        <h2 class="text-3xl font-bold mb-2" id="catch-name">New Friend!</h2>
+        <div id="catch-display" class="mb-4"></div>
+        <h2 class="text-3xl font-bold mb-1" id="catch-name">New Friend!</h2>
         <p class="text-yellow-200 mb-4" id="catch-stats"></p>
         <div class="mb-6">
             <label class="block text-xs uppercase opacity-70 mb-1">Name your frog</label>
             <input type="text" id="frog-name-input" class="w-full bg-black/30 border border-white/20 rounded-xl p-3 text-center text-xl outline-none" placeholder="Enter name..." maxlength="15">
         </div>
-        <button onclick="confirmCatch()" class="w-full bg-yellow-400 text-green-900 font-bold py-4 rounded-xl text-xl hover:bg-yellow-300 transition-colors">WELCOME HOME</button>
+        <button onclick="confirmCatch()" class="w-full bg-yellow-400 text-green-900 font-bold py-4 rounded-xl text-xl hover:bg-yellow-300 transition-colors cursor-pointer pointer-events-auto">WELCOME HOME</button>
     </div>
 </div>
 
-<!-- Frog Menu Modal -->
-<div id="frog-menu-modal" class="modal-overlay">
-    <div class="modal-content !max-w-2xl">
-        <div class="flex justify-between items-center mb-6">
-            <h2 class="text-3xl font-bold">Your Pond Friends</h2>
-            <button onclick="closeFrogMenu()" class="text-4xl opacity-50 hover:opacity-100">&times;</button>
+<!-- RENAME MODAL -->
+<div id="rename-modal" class="modal-overlay">
+    <div class="modal-content">
+        <h2 class="text-3xl font-bold mb-4">Rename Frog Friend</h2>
+        <div class="mb-6">
+            <input type="text" id="rename-input" class="w-full bg-black/30 border border-white/20 rounded-xl p-3 text-center text-xl outline-none" placeholder="New name..." maxlength="15">
         </div>
-        <div id="frogs-list" class="grid grid-cols-1 gap-3 max-h-[400px] overflow-y-auto pr-2"></div>
+        <div class="flex gap-3">
+            <button onclick="closeRenameModal()" class="flex-1 py-3 bg-gray-600 rounded-xl font-bold cursor-pointer pointer-events-auto">Cancel</button>
+            <button onclick="confirmRename()" class="flex-1 py-3 bg-yellow-400 text-green-900 font-bold rounded-xl cursor-pointer pointer-events-auto">Save Name</button>
+        </div>
+    </div>
+</div>
+
+<!-- COMPENDIUM MODAL -->
+<div id="frog-menu-modal" class="modal-overlay">
+    <div class="modal-content !max-w-2xl text-left">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-3xl font-bold">Compendium</h2>
+            <button onclick="closeFrogMenu()" class="text-4xl opacity-50 hover:opacity-100 cursor-pointer pointer-events-auto">&times;</button>
+        </div>
+
+        <!-- COMPENDIUM SUBTABS -->
+        <div class="flex gap-2 mb-4 bg-black/20 p-1.5 rounded-2xl pointer-events-auto">
+            <button id="tab-btn-friends" onclick="switchCompendiumTab('friends')" class="flex-1 py-2.5 rounded-xl font-bold bg-yellow-400 text-green-950 text-sm cursor-pointer transition-all">Friends</button>
+            <button id="tab-btn-decor" onclick="switchCompendiumTab('decor')" class="flex-1 py-2.5 rounded-xl font-bold bg-white/10 text-white text-sm cursor-pointer transition-all">Decor</button>
+            <button id="tab-btn-journal" onclick="switchCompendiumTab('journal')" class="flex-1 py-2.5 rounded-xl font-bold bg-white/10 text-white text-sm cursor-pointer transition-all">Journal</button>
+        </div>
+
+        <div id="compendium-content" class="max-h-[380px] overflow-y-auto pr-1"></div>
     </div>
 </div>
 
 <script>
     const MAX_FROGS_PER_PAD = 4;
    
-    const PHRASES = ["Totoro-lly awesome!", "Peaceful hopping", "The water is fine", "Zen ripples", "Spirit of the pond", "Leap of faith", "Don't worry, be hoppy", "Lily pad lounging", "Ribbiting adventure", "The final ribbit"];
+    const PHRASES = [
+        "Totoro-lly awesome!", "Peaceful hopping", "The water is fine", "Zen ripples", 
+        "Spirit of the pond", "Leap of faith", "Don't worry, be hoppy", "Lily pad lounging", 
+        "Ribbiting adventure", "Botanical vibes"
+    ];
     const BANNED_TERMS = ['fuck', 'shit', 'ass', 'bitch', 'cunt', 'dick', 'pussy', 'nigger', 'faggot', 'cock', 'bastard', 'slut', 'whore'];
-    const SPIRIT_NAMES = ["Komorebi", "Susuwatari", "Kodama", "Teto", "Yubaba", "Calcifer", "Jiji", "Haku", "Boh", "Neko", "Zen", "Mochi", "Soot", "Moss", "Rain", "Dew", "Leaf", "Mist", "Spirit"];
+    const SPIRIT_NAMES = ["Komorebi", "Susuwatari", "Kodama", "Teto", "Yubaba", "Calcifer", "Jiji", "Haku", "Boh", "Neko", "Zen", "Mochi", "Soot", "Moss", "Rain", "Dew", "Leaf", "Mist", "Spirit", "Monstera", "Fern", "Flora"];
     const EVO_PREFIXES = ["Silent", "Dappled", "Golden", "Radiant", "Mist-Bound", "Eternal", "Hallowed", "Dancing", "Prismatic", "Abyssal", "Starlit", "Whispering", "Velvet", "Glimmering"];
     const EVO_NOUN = ["Marsh", "Reeds", "Valley", "Grotto", "Sanctuary", "Waters", "Spring", "Lagoon", "Hollow", "Glade", "Zenith", "Reflection", "Basin", "Meadow"];
-    const EVO_DESCS = ["The spirits begin to acknowledge your presence.", "A soft light dances across the surface of the water.", "The air feels heavy with ancient magic.", "Butterflies of light flutter in the distance.", "Everything is perfectly still, and perfectly alive."];
+    const EVO_DESCS = [
+        "The spirits begin to acknowledge your presence.", "A soft light dances across the surface of the water.", 
+        "The air feels heavy with ancient magic.", "Butterflies of light flutter in the distance.", "Everything is perfectly still, and perfectly alive."
+    ];
+
+    const VALID_DLC_KEYS = ["CODE14", "ARTHUR28", "UAREGAY", "LEBRON92", "DLCCODE", "ZELDA"];
 
     const FROG_TYPES = Array.from({ length: 50 }, (_, i) => ({
         id: i,
@@ -332,10 +591,20 @@
         color: ['#86efac', '#f87171', '#60a5fa', '#fbbf24', '#c084fc', '#f472b6', '#ffffff', '#4ade80'][i % 8],
         bonusWeather: ['idle', 'rain', 'snow', 'lightning'][i % 4],
         bonusMult: 1.1 + (i * 0.05),
-        pattern: i % 3 === 0 ? 'dots' : i % 3 === 1 ? 'stripes' : 'none'
+        pattern: i % 3 === 0 ? 'dots' : i % 3 === 1 ? 'stripes' : 'none',
+        isDLC: false
     }));
 
-    // Zelda Frog (Link) - based on the plushie
+    const GREENHOUSE_FROG_TYPES = [
+        { id: 1001, species: "Monstera Frog", color: "#10b981", bonusWeather: "idle", bonusMult: 1.8, pattern: "leaf", isDLC: true },
+        { id: 1002, species: "Fern Sprout", color: "#34d399", bonusWeather: "rain", bonusMult: 2.0, pattern: "sprout", isDLC: true },
+        { id: 1003, species: "Orchid Spirit", color: "#e879f9", bonusWeather: "idle", bonusMult: 2.2, pattern: "petal", isDLC: true },
+        { id: 1004, species: "Succulent Hopper", color: "#22d3ee", bonusWeather: "snow", bonusMult: 2.5, pattern: "dots", isDLC: true },
+        { id: 1005, species: "Terrarium Toad", color: "#fbbf24", bonusWeather: "idle", bonusMult: 3.0, pattern: "crystal", isDLC: true }
+    ];
+
+    const ALL_FROG_TYPES = [...FROG_TYPES, ...GREENHOUSE_FROG_TYPES];
+
     const ZELDA_FROG = {
         id: 999999,
         typeId: 0,
@@ -349,6 +618,7 @@
         totalInEvo: 0,
         evolution: 0,
         pads: 1,
+        padPositions: [],
         clickLv: 1,
         totems: 0,
         mult: 1.0,
@@ -361,10 +631,19 @@
         placingFrogId: null,
         gameStarted: false,
         lastTapTime: 0,
-        isPlacingPad: false
+        isPlacingPad: false,
+        dlcUnlocked: false,
+        greenhouseActive: false,
+        ghPerks: { orchid: 0, mister: 0 },
+        placedDecors: [],
+        placingDecorType: null,
+        activeCompendiumTab: 'friends',
+        renamingFrogId: null,
+        movingDecorId: null
     };
 
     function getFrogSVG(type, isZelda = false) {
+        if (!type) type = ALL_FROG_TYPES[0];
         if (isZelda) {
             return `<svg viewBox="0 0 100 100" style="width:100%; height:100%;">
                 <ellipse cx="50" cy="52" rx="34" ry="32" fill="#60a5fa" stroke="#1e40af" stroke-width="4"/>
@@ -376,9 +655,22 @@
                 <path d="M25 25 Q50 12 75 25" fill="#fcd34d" opacity="0.9"/>
             </svg>`;
         }
-        let pattern = '';
-        if (type.pattern === 'dots') pattern = `<circle cx="35" cy="40" r="3" fill="white" opacity="0.4"/><circle cx="65" cy="40" r="3" fill="white" opacity="0.4"/>`;
-        if (type.pattern === 'stripes') pattern = `<rect x="30" y="45" width="40" height="2" fill="white" opacity="0.3"/><rect x="30" y="55" width="40" height="2" fill="white" opacity="0.3"/>`;
+
+        let patternSvg = '';
+        if (type.pattern === 'dots') {
+            patternSvg = `<circle cx="35" cy="40" r="3" fill="white" opacity="0.4"/><circle cx="65" cy="40" r="3" fill="white" opacity="0.4"/>`;
+        } else if (type.pattern === 'stripes') {
+            patternSvg = `<rect x="30" y="45" width="40" height="2" fill="white" opacity="0.3"/><rect x="30" y="55" width="40" height="2" fill="white" opacity="0.3"/>`;
+        } else if (type.pattern === 'leaf') {
+            patternSvg = `<path d="M50 40 Q45 50 50 60 Q55 50 50 40 Z" fill="#047857" opacity="0.6"/>`;
+        } else if (type.pattern === 'sprout') {
+            patternSvg = `<path d="M50 35 Q40 25 50 20 Q60 25 50 35 Z" fill="#a7f3d0"/>`;
+        } else if (type.pattern === 'petal') {
+            patternSvg = `<circle cx="50" cy="45" r="5" fill="#f472b6" opacity="0.8"/>`;
+        } else if (type.pattern === 'crystal') {
+            patternSvg = `<polygon points="50,38 55,48 45,48" fill="#fde047" opacity="0.8"/>`;
+        }
+
         return `<svg viewBox="0 0 100 100" style="width:100%; height:100%;">
             <ellipse cx="50" cy="55" rx="35" ry="30" fill="${type.color}" stroke="rgba(0,0,0,0.1)" stroke-width="2"/>
             <circle cx="35" cy="35" r="10" fill="${type.color}"/>
@@ -386,7 +678,7 @@
             <circle cx="35" cy="35" r="4" fill="white"/><circle cx="35" cy="35" r="1.5" fill="black"/>
             <circle cx="65" cy="35" r="4" fill="white"/><circle cx="65" cy="35" r="1.5" fill="black"/>
             <path d="M35 70 Q50 80 65 70" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="3" stroke-linecap="round"/>
-            ${pattern}
+            ${patternSvg}
         </svg>`;
     }
 
@@ -395,6 +687,7 @@
         state.totalInEvo = 0;
         state.evolution = 0;
         state.pads = 1;
+        state.padPositions = [];
         state.clickLv = 1;
         state.totems = 0;
         state.mult = 1.0;
@@ -407,6 +700,7 @@
         state.placingFrogId = null;
         state.isPlacingPad = false;
         state.lastTapTime = 0;
+        state.placedDecors = [];
 
         document.querySelectorAll('.lily-pad').forEach((pad, index) => {
             if (index > 0) pad.remove();
@@ -414,23 +708,32 @@
         document.getElementById('pond-container').style.setProperty('--bg-top', '#a7f3d0');
         document.getElementById('pond-container').style.setProperty('--bg-bottom', '#4fac82');
         document.getElementById('fx-layer').innerHTML = '';
+        document.getElementById('botanical-layer').innerHTML = '';
         document.getElementById('spirit-layer').innerHTML = '';
         cancelPlacement();
     }
 
     function startGame() {
         state.gameStarted = true;
+        
+        if (localStorage.getItem("dlc_greenhouse_unlocked") === "true") {
+            state.dlcUnlocked = true;
+        }
+
         const ts = document.getElementById('title-screen');
-        ts.style.opacity = '0';
-        ts.style.transform = 'scale(1.1)';
-        document.getElementById('pond-container').classList.add('visible');
-        setTimeout(() => { ts.style.display = 'none'; }, 1500);
+        if (ts) {
+            ts.style.opacity = '0';
+            ts.style.transform = 'scale(1.1)';
+            setTimeout(() => { ts.style.display = 'none'; }, 1500);
+        }
+        const pond = document.getElementById('pond-container');
+        if (pond) pond.classList.add('visible');
         updateUI();
     }
 
     function pickRandomSubtitle() {
         const sub = document.getElementById('random-subtitle');
-        sub.innerText = PHRASES[Math.floor(Math.random() * PHRASES.length)];
+        if (sub) sub.innerText = PHRASES[Math.floor(Math.random() * PHRASES.length)];
     }
 
     function checkProfanity(text) {
@@ -440,6 +743,7 @@
     }
 
     function generateEvoName(level) {
+        if (state.greenhouseActive) return "Botanical Greenhouse";
         if (level === 0) return "Morning Marsh";
         const p = EVO_PREFIXES[Math.floor((level * 7) % EVO_PREFIXES.length)];
         const n = EVO_NOUN[Math.floor((level * 13) % EVO_NOUN.length)];
@@ -455,40 +759,337 @@
     function toggleFullscreen() {
         if (!document.fullscreenElement) {
             document.documentElement.requestFullscreen().catch(() => {});
-            document.getElementById('fs-icon').innerHTML = '<path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18v-3a2 2 0 0 1 2-2h3M3 16h3a2 2 0 0 1 2 2v3"></path>';
+            const icon = document.getElementById('fs-icon');
+            if (icon) icon.innerHTML = '<path d="M8 3v3a2 2 0 0 1-2 2H3m18 0h-3a2 2 0 0 1-2-2V3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>';
         } else {
             document.exitFullscreen();
-            document.getElementById('fs-icon').innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>';
+            const icon = document.getElementById('fs-icon');
+            if (icon) icon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>';
         }
+    }
+
+    function openDLCModal() {
+        updateDLCModalUI();
+        const modal = document.getElementById('dlc-modal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeDLCModal() {
+        const modal = document.getElementById('dlc-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function updateDLCModalUI() {
+        const lockSec = document.getElementById('dlc-lock-section');
+        const activeSec = document.getElementById('dlc-active-section');
+        const statusLbl = document.getElementById('dlc-ownership-status');
+        const toggleBtn = document.getElementById('toggle-theme-btn');
+        const badge = document.getElementById('theme-badge');
+
+        if (state.dlcUnlocked) {
+            if (statusLbl) statusLbl.innerHTML = "Status: <span class='text-emerald-400'>UNLOCKED ✅</span>";
+            if (lockSec) lockSec.classList.add('hidden');
+            if (activeSec) activeSec.classList.remove('hidden');
+            
+            if (toggleBtn) {
+                if (state.greenhouseActive) {
+                    toggleBtn.innerText = "Switch to Pond View";
+                    toggleBtn.className = "bg-emerald-600 text-white font-bold px-6 py-3 rounded-xl hover:bg-emerald-500 transition-all cursor-pointer pointer-events-auto";
+                } else {
+                    toggleBtn.innerText = "Activate Greenhouse DLC";
+                    toggleBtn.className = "bg-yellow-400 text-emerald-950 font-bold px-6 py-3 rounded-xl hover:bg-yellow-300 transition-all cursor-pointer pointer-events-auto";
+                }
+            }
+            if (badge) {
+                if (state.greenhouseActive) badge.classList.remove('hidden');
+                else badge.classList.add('hidden');
+            }
+            const dlcStat = document.getElementById('dlc-btn-status');
+            if (dlcStat) dlcStat.innerText = state.greenhouseActive ? "Active 🌿" : "Unlocked";
+
+            ['orchid', 'mister'].forEach(perk => {
+                const btn = document.getElementById(`perk-btn-${perk}`);
+                if (btn && state.ghPerks[perk] > 0) {
+                    btn.innerText = "PURCHASED";
+                    btn.disabled = true;
+                    btn.className = "bg-gray-600 text-gray-300 font-bold px-4 py-2 rounded-xl text-xs cursor-not-allowed";
+                }
+            });
+        } else {
+            if (statusLbl) statusLbl.innerText = "Status: Locked";
+            if (lockSec) lockSec.classList.remove('hidden');
+            if (activeSec) activeSec.classList.add('hidden');
+            if (badge) badge.classList.add('hidden');
+            const dlcStat = document.getElementById('dlc-btn-status');
+            if (dlcStat) dlcStat.innerText = "Get DLC";
+        }
+    }
+
+    function buyGreenhousePerk(perkName, cost) {
+        if (!state.dlcUnlocked || state.ribbits < cost) return;
+        state.ribbits -= cost;
+        if (perkName === 'orchid') {
+            if (state.ghPerks.orchid > 0) return;
+            state.ghPerks.orchid = 1;
+            state.mult += 0.5;
+        } else if (perkName === 'mister') {
+            if (state.ghPerks.mister > 0) return;
+            state.ghPerks.mister = 1;
+        } else {
+            startDecorPlacement(perkName);
+            closeDLCModal();
+            return;
+        }
+        updateDLCModalUI();
+        updateUI();
+        showToast(`🪴 Purchased Botanical Perk: ${perkName.toUpperCase()}!`);
+    }
+
+    function buyTotem() { 
+        const c = Math.floor(5000 * Math.pow(3, state.totems)); 
+        if (state.ribbits >= c) {
+            state.ribbits -= c;
+            state.totems++;
+            updateUI();
+        }
+    }
+
+    function handlePondClick(e) {
+        if (state.zenMode || !state.gameStarted) return;
+        if (state.isPlacingPad && !e.target.closest('.ui-root') && !e.target.closest('#placing-ui')) {
+            placeNewLilyPad(e, null);
+            return;
+        }
+        if (state.placingDecorType && !e.target.closest('.ui-root') && !e.target.closest('#decor-placing-ui')) {
+            confirmDecorPlacement(e);
+            return;
+        }
+        spawnRipple(e.clientX, e.clientY);
+    }
+
+    function startDecorPlacement(decorType) {
+        state.placingDecorType = decorType;
+        state.movingDecorId = null;
+        closeFrogMenu();
+        const titles = {
+            'lantern': 'PLACE TERRARIUM LANTERN',
+            'stonelantern': 'PLACE STONE LANTERN',
+            'rockstack': 'PLACE ZEN ROCK STACK',
+            'windchime': 'PLACE WIND CHIME'
+        };
+        const titleEl = document.getElementById('place-decor-title');
+        if (titleEl) titleEl.innerText = titles[decorType] || 'PLACE DECORATION';
+        const uiEl = document.getElementById('decor-placing-ui');
+        if (uiEl) uiEl.classList.remove('hidden');
+    }
+
+    function moveDecor(decorId) {
+        const decor = state.placedDecors.find(d => d.id === decorId);
+        if (!decor) return;
+        state.movingDecorId = decorId;
+        state.placingDecorType = decor.type;
+        closeFrogMenu();
+        const uiEl = document.getElementById('decor-placing-ui');
+        if (uiEl) uiEl.classList.remove('hidden');
+    }
+
+    function confirmDecorPlacement(e) {
+        if (!state.placingDecorType) return;
+        const rect = document.getElementById('pond-container').getBoundingClientRect();
+        let clickX = e.clientX - rect.left;
+        let clickY = e.clientY - rect.top;
+        const pctX = (clickX / rect.width) * 100;
+        const pctY = (clickY / rect.height) * 100;
+
+        if (state.movingDecorId !== null) {
+            const decor = state.placedDecors.find(d => d.id === state.movingDecorId);
+            if (decor) {
+                decor.x = pctX;
+                decor.y = pctY;
+            }
+            state.movingDecorId = null;
+        } else {
+            state.placedDecors.push({
+                id: Date.now(),
+                type: state.placingDecorType,
+                x: pctX,
+                y: pctY
+            });
+        }
+
+        state.placingDecorType = null;
+        const uiEl = document.getElementById('decor-placing-ui');
+        if (uiEl) uiEl.classList.add('hidden');
+        refreshPondDecors();
+        updateUI();
+    }
+
+    function cancelDecorPlacement() {
+        state.placingDecorType = null;
+        state.movingDecorId = null;
+        const uiEl = document.getElementById('decor-placing-ui');
+        if (uiEl) uiEl.classList.add('hidden');
+    }
+
+    function refreshPondDecors() {
+        document.querySelectorAll('.placed-decor').forEach(el => el.remove());
+        const mainCluster = document.getElementById('main-cluster');
+        if (!mainCluster) return;
+        
+        state.placedDecors.forEach(decor => {
+            const el = document.createElement('div');
+            el.className = 'placed-decor';
+            el.style.left = `${decor.x}%`;
+            el.style.top = `${decor.y}%`;
+            
+            if (decor.type === 'lantern') {
+                el.title = 'Terrarium Lantern';
+                el.innerHTML = `<svg viewBox="0 0 50 50" style="width:100%; height:100%; filter: drop-shadow(0 0 8px #fde047);"><circle cx="25" cy="25" r="15" fill="#fde047" opacity="0.85"/><path d="M20 10 L30 10 L35 20 L15 20 Z" fill="#b45309"/><rect x="23" y="5" width="4" height="5" fill="#78350f"/></svg>`;
+            } else if (decor.type === 'stonelantern') {
+                el.title = 'Stone Lantern';
+                el.innerHTML = `<svg viewBox="0 0 50 50" style="width:100%; height:100%;"><rect x="18" y="15" width="14" height="25" fill="#71717a" rx="3"/><path d="M12 15 L25 5 L38 15 Z" fill="#52525b"/><rect x="21" y="20" width="8" height="10" fill="#fde047" opacity="0.8"/></svg>`;
+            } else if (decor.type === 'rockstack') {
+                el.title = 'Zen Rock Stack';
+                el.innerHTML = `<svg viewBox="0 0 50 50" style="width:100%; height:100%;"><ellipse cx="25" cy="40" rx="18" ry="8" fill="#71717a"/><ellipse cx="25" cy="28" rx="13" ry="7" fill="#a1a1aa"/><ellipse cx="25" cy="18" rx="8" ry="5" fill="#d4d4d8"/></svg>`;
+            } else if (decor.type === 'windchime') {
+                el.title = 'Wind Chime';
+                el.innerHTML = `<svg viewBox="0 0 50 50" style="width:100%; height:100%;"><path d="M25 5 L25 40 M15 15 L35 15 M18 25 L32 25" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/><circle cx="25" cy="3" r="3" fill="#fbbf24"/></svg>`;
+            }
+            mainCluster.appendChild(el);
+        });
+    }
+
+    function activateDLCKey() {
+        const inputEl = document.getElementById('dlc-key-input');
+        if (!inputEl) return;
+        const inputKey = inputEl.value.trim().toUpperCase();
+        
+        if (inputKey === "2810") {
+            const secretDisplay = document.getElementById('secret-codes-display');
+            if (secretDisplay) secretDisplay.classList.remove('hidden');
+            showToast("🔓 Secret codes revealed!");
+            return;
+        }
+
+        if (VALID_DLC_KEYS.includes(inputKey)) {
+            state.dlcUnlocked = true;
+            localStorage.setItem("dlc_greenhouse_unlocked", "true");
+            updateDLCModalUI();
+            updateUI();
+            showToast("🎉 Greenhouse DLC Unlocked!");
+        } else {
+            inputEl.classList.add('input-error');
+            setTimeout(() => inputEl.classList.remove('input-error'), 400);
+            showToast("❌ Invalid DLC Key");
+        }
+    }
+
+    function toggleGreenhouseTheme() {
+        if (!state.dlcUnlocked) return;
+        state.greenhouseActive = !state.greenhouseActive;
+        document.body.classList.toggle('theme-greenhouse', state.greenhouseActive);
+
+        const placeText = document.getElementById('place-pad-text');
+        if (placeText) placeText.innerText = state.greenhouseActive ? "PLACE NEW PLANT POT" : "PLACE NEW LILY PAD";
+
+        if (state.greenhouseActive) {
+            setupBotanicalEffects();
+            showToast("🪴 Welcome to The Greenhouse!");
+        } else {
+            const bLayer = document.getElementById('botanical-layer');
+            if (bLayer) bLayer.innerHTML = '';
+            showToast("🌊 Returned to Morning Marsh!");
+        }
+
+        updateDLCModalUI();
+        updateUI();
+    }
+
+    function setupBotanicalEffects() {
+        const bLayer = document.getElementById('botanical-layer');
+        if (!bLayer) return;
+        bLayer.innerHTML = '';
+
+        for (let i = 0; i < 20; i++) {
+            const spore = document.createElement('div');
+            spore.className = 'mist-spore';
+            const size = 6 + Math.random() * 12;
+            spore.style.width = size + 'px';
+            spore.style.height = size + 'px';
+            spore.style.left = Math.random() * 100 + 'vw';
+            spore.style.top = Math.random() * 100 + 'vh';
+            spore.style.animationDelay = (Math.random() * 5) + 's';
+            bLayer.appendChild(spore);
+        }
+
+        for (let i = 0; i < 8; i++) {
+            const leaf = document.createElement('div');
+            leaf.className = 'falling-leaf';
+            leaf.style.left = Math.random() * 100 + 'vw';
+            leaf.style.animationDelay = (Math.random() * 7) + 's';
+            bLayer.appendChild(leaf);
+        }
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('zen-toast');
+        if (!toast) return;
+        toast.textContent = msg;
+        toast.style.opacity = '1';
+        setTimeout(() => {
+            toast.style.opacity = '0';
+            setTimeout(() => {
+                toast.textContent = "Double click / double tap anywhere to return home";
+            }, 800);
+        }, 3000);
     }
 
     function updateUI() {
         const frogBonusMult = state.myFrogs.reduce((acc, f) => {
-            const type = FROG_TYPES[f.typeId];
+            const type = ALL_FROG_TYPES.find(t => t.id === f.typeId) || ALL_FROG_TYPES[0];
             const active = (type.bonusWeather === state.weather || type.bonusWeather === 'idle') && f.padIndex !== -1;
             return acc + (active ? type.bonusMult - 1 : 0);
         }, 1);
-        const totalMult = state.mult * state.zenMult * frogBonusMult;
 
-        document.getElementById('score').innerText = Math.floor(state.ribbits).toLocaleString();
-        document.getElementById('multiplier').innerText = `x${totalMult.toFixed(1)}`;
-        document.getElementById('evo-name').innerText = generateEvoName(state.evolution);
-        document.getElementById('evo-level').innerText = state.evolution;
-        document.getElementById('evo-goal').innerText = `Goal: ${state.evoGoal.toLocaleString()}`;
-        document.getElementById('evo-bar').style.width = Math.min(100, (state.totalInEvo / state.evoGoal) * 100) + '%';
-        document.getElementById('frog-count').innerText = `Owned: ${state.myFrogs.length}`;
+        const greenhouseMultiplier = state.greenhouseActive ? 1.5 : 1.0;
+        const totalMult = state.mult * state.zenMult * frogBonusMult * greenhouseMultiplier;
+
+        const scoreEl = document.getElementById('score');
+        if (scoreEl) scoreEl.innerText = Math.floor(state.ribbits).toLocaleString();
+        const multEl = document.getElementById('multiplier');
+        if (multEl) multEl.innerText = `x${totalMult.toFixed(1)}`;
+        const evoNameEl = document.getElementById('evo-name');
+        if (evoNameEl) evoNameEl.innerText = generateEvoName(state.evolution);
+        const evoLevelEl = document.getElementById('evo-level');
+        if (evoLevelEl) evoLevelEl.innerText = state.evolution;
+        const evoGoalEl = document.getElementById('evo-goal');
+        if (evoGoalEl) evoGoalEl.innerText = `Goal: ${state.evoGoal.toLocaleString()}`;
+        const evoBarEl = document.getElementById('evo-bar');
+        if (evoBarEl) evoBarEl.style.width = Math.min(100, (state.totalInEvo / state.evoGoal) * 100) + '%';
+        const frogCountEl = document.getElementById('frog-count');
+        if (frogCountEl) frogCountEl.innerText = `Owned: ${state.myFrogs.length}`;
 
         const pCost = Math.floor(150 * Math.pow(2.2, state.pads - 1));
         const cCost = Math.floor(250 * Math.pow(1.7, state.clickLv - 1));
         const tCost = Math.floor(5000 * Math.pow(3, state.totems));
 
-        document.getElementById('cost-pad').innerText = state.pads < 12 ? pCost.toLocaleString() : "MAX";
-        document.getElementById('cost-click').innerText = cCost.toLocaleString();
-        document.getElementById('cost-totem').innerText = tCost.toLocaleString();
+        const costPadEl = document.getElementById('cost-pad');
+        if (costPadEl) costPadEl.innerText = state.pads < 12 ? pCost.toLocaleString() : "MAX";
+        const costClickEl = document.getElementById('cost-click');
+        if (costClickEl) costClickEl.innerText = cCost.toLocaleString();
+        const costTotemEl = document.getElementById('cost-totem');
+        if (costTotemEl) costTotemEl.innerText = tCost.toLocaleString();
 
-        document.getElementById('btn-add-pad').disabled = state.ribbits < pCost || state.pads >= 12;
-        document.getElementById('btn-click').disabled = state.ribbits < cCost;
-        document.getElementById('btn-totem').disabled = state.ribbits < tCost;
+        const btnAddPad = document.getElementById('btn-add-pad');
+        if (btnAddPad) btnAddPad.disabled = state.ribbits < pCost || state.pads >= 12;
+
+        const btnClick = document.getElementById('btn-click');
+        if (btnClick) btnClick.disabled = state.ribbits < cCost;
+
+        const btnTotem = document.getElementById('btn-totem');
+        if (btnTotem) btnTotem.disabled = state.ribbits < tCost;
+
+        updateDLCModalUI();
     }
 
     function gainRibbits(amt) {
@@ -503,122 +1104,149 @@
         state.totalInEvo = 0;
         state.evoGoal = Math.floor(state.evoGoal * 2.8);
         state.mult += 0.3 + (state.evolution * 0.08);
-        const pair = generateEvoColor(state.evolution);
-        document.getElementById('pond-container').style.setProperty('--bg-top', pair[0]);
-        document.getElementById('pond-container').style.setProperty('--bg-bottom', pair[1]);
-        document.getElementById('evo-desc').innerText = EVO_DESCS[Math.floor(Math.random() * EVO_DESCS.length)];
+        
+        if (!state.greenhouseActive) {
+            const pair = generateEvoColor(state.evolution);
+            const pondContainer = document.getElementById('pond-container');
+            if (pondContainer) {
+                pondContainer.style.setProperty('--bg-top', pair[0]);
+                pondContainer.style.setProperty('--bg-bottom', pair[1]);
+            }
+        }
+
+        const evoDesc = document.getElementById('evo-desc');
+        if (evoDesc) evoDesc.innerText = EVO_DESCS[Math.floor(Math.random() * EVO_DESCS.length)];
         spawnSpiritBurst();
         randomizeWeather();
     }
 
-    // NERFED MONEY SYSTEM
     function buyPad() {
-        const cost = Math.floor(150 * Math.pow(2.5, state.pads - 1));
+        const cost = Math.floor(150 * Math.pow(2.2, state.pads - 1));
         if (state.ribbits < cost || state.pads >= 12) return;
         state.ribbits -= cost;
         state.isPlacingPad = true;
-        document.getElementById('placing-ui').classList.remove('hidden');
+        const placingUi = document.getElementById('placing-ui');
+        if (placingUi) placingUi.classList.remove('hidden');
         updateUI();
     }
 
-    function buyClick() { 
-        const c = Math.floor(250 * Math.pow(1.9, state.clickLv - 1)); 
-        if(state.ribbits >= c){ state.ribbits -= c; state.clickLv++; updateUI(); }
-    }
-
-    function buyTotem() { 
-        const c = Math.floor(5000 * Math.pow(4, state.totems)); 
-        if(state.ribbits >= c){ state.ribbits -= c; state.totems++; updateUI(); }
-    }
-
-    // LILY PAD PLACEMENT
-    function handlePondClick(e) {
-        if (state.zenMode || !state.gameStarted) return;
-        if (state.isPlacingPad && !e.target.closest('.ui-root') && !e.target.closest('#placing-ui')) {
-            placeNewLilyPad(e);
-            return;
-        }
-        spawnRipple(e.clientX, e.clientY);
-    }
-
-    function placeNewLilyPad(e) {
-        if (!state.isPlacingPad) return;
+    function placeNewLilyPad(e, savedPos = null) {
         const rect = document.getElementById('pond-container').getBoundingClientRect();
-        let clickX = e.clientX - rect.left;
-        let clickY = e.clientY - rect.top;
-        clickX = Math.max(70, Math.min(rect.width - 70, clickX));
-        clickY = Math.max(60, Math.min(rect.height - 60, clickY));
+        let clickX, clickY;
+
+        if (savedPos) {
+            clickX = (savedPos.x / 100) * rect.width;
+            clickY = (savedPos.y / 100) * rect.height;
+        } else if (e) {
+            clickX = e.clientX - rect.left;
+            clickY = e.clientY - rect.top;
+            clickX = Math.max(70, Math.min(rect.width - 70, clickX));
+            clickY = Math.max(60, Math.min(rect.height - 60, clickY));
+        } else {
+            clickX = rect.width / 2 + (Math.random() * 200 - 100);
+            clickY = rect.height / 2 + (Math.random() * 200 - 100);
+        }
+
+        const pctX = (clickX / rect.width) * 100;
+        const pctY = (clickY / rect.height) * 100;
 
         const padId = state.pads;
-        const pad = document.createElement('div');
-        pad.className = 'lily-pad';
-        pad.id = `pad-${padId}`;
-        pad.style.left = `${clickX - 60}px`;
-        pad.style.top = `${clickY - 50}px`;
-        pad.onclick = (ev) => handlePadInteraction(padId, ev);
-        document.getElementById('main-cluster').appendChild(pad);
+        state.padPositions.push({ id: padId, x: pctX, y: pctY });
+
+        const mainCluster = document.getElementById('main-cluster');
+        if (mainCluster) {
+            const pad = document.createElement('div');
+            pad.className = 'lily-pad';
+            pad.id = `pad-${padId}`;
+            pad.style.left = `${clickX - 60}px`;
+            pad.style.top = `${clickY - 50}px`;
+            pad.onclick = (ev) => handlePadInteraction(padId, ev);
+            mainCluster.appendChild(pad);
+        }
        
-        state.pads++;
+        if (!savedPos) state.pads++;
         state.isPlacingPad = false;
-        document.getElementById('placing-ui').classList.add('hidden');
+        const placingUi = document.getElementById('placing-ui');
+        if (placingUi) placingUi.classList.add('hidden');
         updateUI();
     }
 
     function cancelPlacement() {
         state.isPlacingPad = false;
-        document.getElementById('placing-ui').classList.add('hidden');
+        const placingUi = document.getElementById('placing-ui');
+        if (placingUi) placingUi.classList.add('hidden');
     }
 
-    // SAVE / LOAD
+    function buyClick() { 
+        const c = Math.floor(250 * Math.pow(1.7, state.clickLv - 1)); 
+        if (state.ribbits >= c) {
+            state.ribbits -= c;
+            state.clickLv++;
+            updateUI();
+        }
+    }
+
     function saveGame() {
-        const saveData = { v: 1, r: Math.floor(state.ribbits), t: state.totalInEvo, e: state.evolution, p: state.pads, c: state.clickLv, o: state.totems, m: state.mult, g: state.evoGoal, f: state.myFrogs };
+        const saveData = { 
+            v: 2, 
+            r: Math.floor(state.ribbits), 
+            t: state.totalInEvo, 
+            e: state.evolution, 
+            p: state.pads, 
+            padPos: state.padPositions,
+            c: state.clickLv, 
+            o: state.totems, 
+            m: state.mult, 
+            g: state.evoGoal, 
+            f: state.myFrogs,
+            dlc: state.dlcUnlocked,
+            gh: state.greenhouseActive,
+            perks: state.ghPerks,
+            decors: state.placedDecors
+        };
         const jsonStr = JSON.stringify(saveData);
         const checksum = jsonStr.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 999999;
         const finalSave = jsonStr + "|" + checksum;
+
+        localStorage.setItem("frogfriends_save", finalSave);
         navigator.clipboard.writeText(finalSave).then(() => {
-            const toast = document.getElementById('zen-toast');
-            toast.textContent = "✅ Save copied to clipboard!";
-            toast.style.opacity = '1';
-            setTimeout(() => { toast.style.opacity = '0'; toast.textContent = "Double click / double tap anywhere to return home"; }, 3000);
+            showToast("✅ Game saved & copied to clipboard!");
+        }).catch(() => {
+            showToast("✅ Game saved successfully!");
         });
     }
 
     function showLoadModal() {
-        document.getElementById('load-modal').style.display = 'flex';
-        document.getElementById('load-data').focus();
+        const modal = document.getElementById('load-modal');
+        if (modal) modal.style.display = 'flex';
+        const txt = document.getElementById('load-data');
+        if (txt) {
+            txt.value = localStorage.getItem("frogfriends_save") || "";
+            txt.focus();
+        }
     }
 
     function closeLoadModal() {
-        document.getElementById('load-modal').style.display = 'none';
+        const modal = document.getElementById('load-modal');
+        if (modal) modal.style.display = 'none';
     }
 
     function loadGame() {
-        const input = document.getElementById('load-data').value.trim();
-        if (!input) return alert("Please paste something!");
+        const loadInput = document.getElementById('load-data');
+        if (!loadInput) return;
+        const input = loadInput.value.trim();
+        if (!input) return alert("Please paste save data!");
 
         if (input === "code14") {
             closeLoadModal();
-            document.getElementById('admin-panel').style.display = 'flex';
+            const admin = document.getElementById('admin-panel');
+            if (admin) admin.style.display = 'flex';
             return;
         }
 
-        if (input === "[frogo]zelda") {
-            closeLoadModal();
-            const linkFrog = {...ZELDA_FROG, id: Date.now()};
-            state.myFrogs.push(linkFrog);
-            refreshPondFrogs();
-            updateUI();
-            alert("✅ Link the Zelda frog has been added to your pond!");
-            return;
-        }
-
-        // Normal save load
         try {
             const parts = input.split("|");
-            const jsonStr = parts[0];
-
-            const decoded = JSON.parse(jsonStr);
-            if (decoded.v !== 1) throw new Error();
+            const decoded = JSON.parse(parts[0]);
 
             resetGameState();
 
@@ -626,66 +1254,92 @@
             state.totalInEvo = decoded.t || 0;
             state.evolution = decoded.e || 0;
             state.pads = Math.max(1, decoded.p || 1);
+            state.padPositions = decoded.padPos || [];
             state.clickLv = decoded.c || 1;
             state.totems = decoded.o || 0;
             state.mult = decoded.m || 1.0;
             state.evoGoal = decoded.g || 100;
             state.myFrogs = decoded.f || [];
+            state.dlcUnlocked = !!decoded.dlc;
+            state.greenhouseActive = !!decoded.gh;
+            state.ghPerks = decoded.perks || { orchid: 0, mister: 0 };
+            state.placedDecors = decoded.decors || [];
+
+            if (state.dlcUnlocked) {
+                localStorage.setItem("dlc_greenhouse_unlocked", "true");
+            }
+            document.body.classList.toggle('theme-greenhouse', state.greenhouseActive);
 
             const mainCluster = document.getElementById('main-cluster');
-            for (let i = 1; i < state.pads; i++) {
-                if (!document.getElementById(`pad-${i}`)) {
-                    const pad = document.createElement('div');
-                    pad.className = 'lily-pad';
-                    pad.id = `pad-${i}`;
-                    pad.style.left = (15 + Math.random() * 70) + '%';
-                    pad.style.top = (15 + Math.random() * 70) + '%';
-                    pad.onclick = (e) => handlePadInteraction(i, e);
-                    mainCluster.appendChild(pad);
+            if (mainCluster) {
+                const pad0 = document.getElementById('pad-0');
+                if (pad0 && state.padPositions.length > 0 && state.padPositions[0].id === 0) {
+                    const rect = document.getElementById('pond-container').getBoundingClientRect();
+                    pad0.style.left = `${(state.padPositions[0].x / 100) * rect.width - 60}px`;
+                    pad0.style.top = `${(state.padPositions[0].y / 100) * rect.height - 50}px`;
                 }
+
+                for (let i = 1; i < state.pads; i++) {
+                    const savedPos = state.padPositions.find(p => p.id === i);
+                    if (!document.getElementById(`pad-${i}`)) {
+                        const pad = document.createElement('div');
+                        pad.className = 'lily-pad';
+                        pad.id = `pad-${i}`;
+                        const rect = document.getElementById('pond-container').getBoundingClientRect();
+                        const px = savedPos ? (savedPos.x / 100) * rect.width : (15 + Math.random() * 70) * rect.width / 100;
+                        const py = savedPos ? (savedPos.y / 100) * rect.height : (15 + Math.random() * 70) * rect.height / 100;
+                        pad.style.left = `${px - 60}px`;
+                        pad.style.top = `${py - 50}px`;
+                        pad.onclick = (e) => handlePadInteraction(i, e);
+                        mainCluster.appendChild(pad);
+                        if (!savedPos) {
+                            state.padPositions.push({ id: i, x: (px / rect.width) * 100, y: (py / rect.height) * 100 });
+                        }
+                    }
+                }
+            }
+
+            if (state.greenhouseActive) {
+                setupBotanicalEffects();
             }
 
             closeLoadModal();
             refreshPondFrogs();
+            refreshPondDecors();
             updateUI();
-
-            const toast = document.getElementById('zen-toast');
-            toast.textContent = "✅ Progress loaded successfully!";
-            toast.style.opacity = '1';
-            setTimeout(() => { toast.style.opacity = '0'; toast.textContent = "Double click / double tap anywhere to return home"; }, 3000);
+            showToast("✅ Progress loaded successfully!");
         } catch (e) {
-            alert("Invalid save data!");
+            alert("Invalid save data! Please verify your save string.");
         }
     }
 
-    function closeAdminPanel() { document.getElementById('admin-panel').style.display = 'none'; }
+    function closeAdminPanel() { 
+        const panel = document.getElementById('admin-panel');
+        if (panel) panel.style.display = 'none'; 
+    }
 
     function adminAddRibbitsCustom() {
-        const amt = parseFloat(document.getElementById('admin-ribbits').value) || 0;
+        const input = document.getElementById('admin-ribbits');
+        const amt = input ? parseFloat(input.value) || 0 : 100000;
         if (amt > 0) gainRibbits(amt);
     }
 
     function adminSpawnFrogsCustom() {
-        const count = parseInt(document.getElementById('admin-frogs').value) || 1;
+        const input = document.getElementById('admin-frogs');
+        const count = input ? parseInt(input.value) || 1 : 1;
         for (let i = 0; i < count; i++) {
-            const type = FROG_TYPES[Math.floor(Math.random() * FROG_TYPES.length)];
+            const pool = state.greenhouseActive ? ALL_FROG_TYPES : FROG_TYPES;
+            const type = pool[Math.floor(Math.random() * pool.length)];
             state.myFrogs.push({ id: Date.now() + i, typeId: type.id, name: SPIRIT_NAMES[Math.floor(Math.random() * SPIRIT_NAMES.length)], padIndex: -1 });
         }
         updateUI();
     }
 
     function adminAddPadsCustom() {
-        const count = parseInt(document.getElementById('admin-pads').value) || 1;
+        const input = document.getElementById('admin-pads');
+        const count = input ? parseInt(input.value) || 1 : 1;
         for (let i = 0; i < count && state.pads < 12; i++) {
-            const padId = state.pads;
-            const pad = document.createElement('div');
-            pad.className = 'lily-pad';
-            pad.id = `pad-${padId}`;
-            pad.style.left = (15 + Math.random() * 70) + '%';
-            pad.style.top = (15 + Math.random() * 70) + '%';
-            pad.onclick = (e) => handlePadInteraction(padId, e);
-            document.getElementById('main-cluster').appendChild(pad);
-            state.pads++;
+            placeNewLilyPad(null, null);
         }
         updateUI();
     }
@@ -693,32 +1347,50 @@
     function adminMaxEvolution() { while (state.evolution < 30) evolve(); }
     function adminMaxTotems() { state.totems = 50; updateUI(); }
     function adminMaxClick() { state.clickLv = 30; updateUI(); }
+    function adminUnlockDLC() { 
+        state.dlcUnlocked = true; 
+        localStorage.setItem("dlc_greenhouse_unlocked", "true"); 
+        updateUI(); 
+        showToast("🔓 DLC Unlocked via Admin Panel!"); 
+    }
 
-    // Rest of your original functions (handlePadInteraction, spawnWildFrog, initiateCatch, etc.)
     function handlePadInteraction(padIdx, e) {
-        if (state.zenMode || !state.gameStarted || state.isPlacingPad) return;
-        e.stopPropagation();
+        if (state.zenMode || !state.gameStarted) return;
+        if (e) e.stopPropagation();
+        
+        if (state.isPlacingPad) {
+            return;
+        }
+
         if (state.placingFrogId !== null) {
             const frogsOnThisPad = state.myFrogs.filter(f => f.padIndex === padIdx).length;
             if (frogsOnThisPad < MAX_FROGS_PER_PAD) confirmPlacement(padIdx);
             else {
                 const el = document.getElementById(`pad-${padIdx}`);
-                el.classList.add('shake');
-                setTimeout(() => el.classList.remove('shake'), 400);
+                if (el) {
+                    el.classList.add('shake');
+                    setTimeout(() => el.classList.remove('shake'), 400);
+                }
             }
             return;
         }
-        const power = 5 * Math.pow(1.5, state.clickLv - 1) * state.mult;
+        const ghBonus = state.greenhouseActive ? 1.5 : 1.0;
+        const power = 5 * Math.pow(1.5, state.clickLv - 1) * state.mult * ghBonus;
         gainRibbits(power);
-        spawnText(e.clientX, e.clientY, `+${Math.floor(power)}`);
-        spawnRipple(e.clientX, e.clientY);
+        if (e && e.clientX) {
+            spawnText(e.clientX, e.clientY, `+${Math.floor(power)}`);
+            spawnRipple(e.clientX, e.clientY);
+        }
     }
 
     function spawnWildFrog(padIdx) {
         if (!state.gameStarted) return;
         const pad = document.getElementById(`pad-${padIdx}`);
         if (!pad || pad.querySelectorAll('.frog-sprite').length > 0) return;
-        const type = FROG_TYPES[Math.floor(Math.random() * FROG_TYPES.length)];
+        
+        const pool = (state.greenhouseActive && state.dlcUnlocked) ? ALL_FROG_TYPES : FROG_TYPES;
+        const type = pool[Math.floor(Math.random() * pool.length)];
+
         const frogEl = document.createElement('div');
         frogEl.className = 'frog-sprite wild-frog';
         frogEl.innerHTML = getFrogSVG(type);
@@ -729,29 +1401,39 @@
 
     function initiateCatch(type, padIdx) {
         state.currentCatch = { type, padIdx };
-        document.getElementById('catch-display').innerHTML = `<div class="w-32 h-32 mx-auto">${getFrogSVG(type)}</div>`;
-        document.getElementById('catch-name').innerText = type.species;
-        document.getElementById('catch-stats').innerText = `Bonus: ${type.bonusWeather.toUpperCase()} (+${((type.bonusMult - 1) * 100).toFixed(0)}%)`;
-        document.getElementById('frog-name-input').value = "";
-        document.getElementById('catch-modal').style.display = 'flex';
+        const disp = document.getElementById('catch-display');
+        if (disp) disp.innerHTML = `<div class="w-32 h-32 mx-auto">${getFrogSVG(type)}</div>`;
+        const nameEl = document.getElementById('catch-name');
+        if (nameEl) nameEl.innerText = type.species;
+        const statsEl = document.getElementById('catch-stats');
+        if (statsEl) statsEl.innerText = `${type.isDLC ? '🪴 DLC EXCLUSIVE • ' : ''}Bonus: ${type.bonusWeather.toUpperCase()} (+${((type.bonusMult - 1) * 100).toFixed(0)}%)`;
+        const inputEl = document.getElementById('frog-name-input');
+        if (inputEl) inputEl.value = "";
+        const modal = document.getElementById('catch-modal');
+        if (modal) modal.style.display = 'flex';
     }
 
     function confirmCatch() {
         const input = document.getElementById('frog-name-input');
-        const inputName = input.value.trim();
+        const inputName = input ? input.value.trim() : "";
         if (checkProfanity(inputName)) {
-            input.classList.add('input-error');
-            input.value = SPIRIT_NAMES[Math.floor(Math.random() * SPIRIT_NAMES.length)];
+            if (input) {
+                input.classList.add('input-error');
+                input.value = SPIRIT_NAMES[Math.floor(Math.random() * SPIRIT_NAMES.length)];
+            }
             return;
         }
-        const finalName = inputName || state.currentCatch.type.species;
-        state.myFrogs.push({ id: Date.now(), typeId: state.currentCatch.type.id, name: finalName, padIndex: -1 });
-        const pad = document.getElementById(`pad-${state.currentCatch.padIdx}`);
-        if (pad) {
-            const wild = pad.querySelector('.wild-frog');
-            if(wild) wild.remove();
+        const finalName = inputName || (state.currentCatch ? state.currentCatch.type.species : "Spirit");
+        if (state.currentCatch) {
+            state.myFrogs.push({ id: Date.now(), typeId: state.currentCatch.type.id, name: finalName, padIndex: -1 });
+            const pad = document.getElementById(`pad-${state.currentCatch.padIdx}`);
+            if (pad) {
+                const wild = pad.querySelector('.wild-frog');
+                if(wild) wild.remove();
+            }
         }
-        document.getElementById('catch-modal').style.display = 'none';
+        const modal = document.getElementById('catch-modal');
+        if (modal) modal.style.display = 'none';
         state.currentCatch = null;
         updateUI();
     }
@@ -780,6 +1462,40 @@
         }
     }
 
+    function openRenameModal(frogId) {
+        state.renamingFrogId = frogId;
+        const frog = state.myFrogs.find(f => f.id === frogId);
+        const input = document.getElementById('rename-input');
+        if (input && frog) input.value = frog.name;
+        closeFrogMenu();
+        const modal = document.getElementById('rename-modal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeRenameModal() {
+        state.renamingFrogId = null;
+        const modal = document.getElementById('rename-modal');
+        if (modal) modal.style.display = 'none';
+        openFrogMenu();
+    }
+
+    function confirmRename() {
+        const input = document.getElementById('rename-input');
+        const newName = input ? input.value.trim() : "";
+        if (checkProfanity(newName)) {
+            if (input) {
+                input.classList.add('input-error');
+            }
+            return;
+        }
+        if (state.renamingFrogId !== null && newName) {
+            const frog = state.myFrogs.find(f => f.id === state.renamingFrogId);
+            if (frog) frog.name = newName;
+        }
+        closeRenameModal();
+        refreshPondFrogs();
+    }
+
     function refreshPondFrogs() {
         document.querySelectorAll('.lily-pad').forEach(p => {
             const wild = p.querySelector('.wild-frog');
@@ -792,7 +1508,8 @@
                 if (pad) {
                     const sprite = document.createElement('div');
                     sprite.className = 'frog-sprite';
-                    sprite.innerHTML = getFrogSVG(FROG_TYPES[f.typeId], f.isZelda);
+                    const frogType = ALL_FROG_TYPES.find(t => t.id === f.typeId) || ALL_FROG_TYPES[0];
+                    sprite.innerHTML = getFrogSVG(frogType, f.isZelda);
                     sprite.title = f.name;
                     pad.appendChild(sprite);
                 }
@@ -812,59 +1529,111 @@
         document.body.classList.toggle('zen-active', active);
         const detector = document.getElementById('zen-exit-detector');
         if (active) {
-            document.getElementById('zen-toast').style.opacity = '1';
-            setTimeout(() => document.getElementById('zen-toast').style.opacity = '0', 2800);
+            showToast("✨ Spirit Realm Active!");
             startZenEcosystem();
-            detector.ondblclick = handleSpiritRealmExit;
-            detector.ontouchstart = handleSpiritRealmExit;
+            spawnSpiritKoi();
+            if (detector) {
+                detector.ondblclick = handleSpiritRealmExit;
+                detector.ontouchstart = handleSpiritRealmExit;
+            }
         } else {
             refreshPondFrogs();
-            detector.ondblclick = null;
-            detector.ontouchstart = null;
+            stopZenEcosystem();
+            if (detector) {
+                detector.ondblclick = null;
+                detector.ontouchstart = null;
+            }
         }
         updateUI();
     }
 
     function startZenEcosystem() { state.zenMult = 2.0; randomizeWeather(); }
-    function stopZenEcosystem() { state.zenMult = 1.0; state.weather = 'idle'; document.getElementById('weather-icon').innerText = '☀️'; }
+    
+    function stopZenEcosystem() { 
+        state.zenMult = 1.0; 
+        state.weather = 'idle'; 
+        const weatherIcon = document.getElementById('weather-icon');
+        if (weatherIcon) weatherIcon.innerText = '☀️';
+        const fishLayer = document.getElementById('fish-layer');
+        if (fishLayer) fishLayer.innerHTML = '';
+    }
+
+    function spawnSpiritKoi() {
+        const fishLayer = document.getElementById('fish-layer');
+        if (!fishLayer) return;
+        fishLayer.innerHTML = '';
+        
+        const koiColors = ['#f97316', '#fbbf24', '#f43f5e', '#ffffff'];
+        
+        for (let i = 0; i < 5; i++) {
+            const koi = document.createElement('div');
+            koi.className = 'spirit-koi';
+            
+            const color = koiColors[i % koiColors.length];
+            const topPos = 15 + Math.random() * 70;
+            const duration = 14 + Math.random() * 12;
+            const delay = -(Math.random() * duration);
+            const scale = 0.6 + Math.random() * 0.6;
+            
+            koi.style.top = `${topPos}%`;
+            koi.style.animationDuration = `${duration}s`;
+            koi.style.animationDelay = `${delay}s`;
+            koi.style.transform = `scale(${scale})`;
+            
+            koi.innerHTML = `
+                <svg viewBox="0 0 120 60" style="width: 90px; height: 45px;">
+                    <path d="M110 30 Q90 10 50 25 Q25 30 10 20 Q15 30 5 40 Q25 35 50 35 Q90 50 110 30 Z" fill="${color}" opacity="0.9"/>
+                    <path d="M15 20 Q0 5 -5 15 Q5 30 10 20 Z" fill="${color}" opacity="0.8"/>
+                    <path d="M15 35 Q0 50 -5 40 Q5 30 10 35 Z" fill="${color}" opacity="0.8"/>
+                    <circle cx="95" cy="24" r="3" fill="#ffffff"/>
+                </svg>
+            `;
+            fishLayer.appendChild(koi);
+        }
+    }
 
     function randomizeWeather() {
         const types = ['idle', 'rain', 'snow'];
         state.weather = types[Math.floor(Math.random() * types.length)];
-        const fx = document.getElementById('fx-layer'); fx.innerHTML = '';
+        const fx = document.getElementById('fx-layer'); 
+        if (!fx) return;
+        fx.innerHTML = '';
         const icon = document.getElementById('weather-icon');
         if (state.weather === 'rain') {
-            icon.innerText = '🌧️';
+            if (icon) icon.innerText = '🌧️';
             for(let i=0; i<40; i++) {
                 const d = document.createElement('div'); d.className = 'rain-drop';
                 d.style.left = Math.random() * 100 + 'vw'; d.style.animationDelay = Math.random() + 's';
                 fx.appendChild(d);
             }
         } else if (state.weather === 'snow') {
-            icon.innerText = '❄️';
+            if (icon) icon.innerText = '❄️';
             for(let i=0; i<30; i++) {
                 const f = document.createElement('div'); f.className = 'snow-flake';
                 const s = 4 + Math.random()*6; f.style.width = s+'px'; f.style.height = s+'px';
                 f.style.left = Math.random()*100+'vw'; f.style.animationDelay = Math.random()*3+'s';
                 fx.appendChild(f);
             }
-        } else { icon.innerText = '☀️'; }
+        } else { if (icon) icon.innerText = '☀️'; }
     }
 
     function spawnSpiritBurst() {
+        const spiritLayer = document.getElementById('spirit-layer');
+        if (!spiritLayer) return;
         for(let i=0; i<15; i++) {
             const orb = document.createElement('div');
             orb.className = 'spirit-orb';
             orb.style.left = (20 + Math.random() * 60) + 'vw';
             orb.style.top = (20 + Math.random() * 60) + 'vh';
-            document.getElementById('spirit-layer').appendChild(orb);
+            spiritLayer.appendChild(orb);
             setTimeout(() => orb.remove(), 10000);
         }
     }
 
     function spawnRipple(x, y) {
         const r = document.createElement('div');
-        r.style.cssText = `position:absolute; width:10px; height:10px; border:2px solid rgba(255,255,255,0.4); border-radius:50%; pointer-events:none; left:${x}px; top:${y}px; transition: all 1s ease-out; opacity:0.6; z-index:1;`;
+        const color = state.greenhouseActive ? "rgba(167, 243, 208, 0.6)" : "rgba(255, 255, 255, 0.4)";
+        r.style.cssText = `position:absolute; width:10px; height:10px; border:2px solid ${color}; border-radius:50%; pointer-events:none; left:${x}px; top:${y}px; transition: all 1s ease-out; opacity:0.6; z-index:1;`;
         document.body.appendChild(r);
         setTimeout(() => { r.style.transform = "scale(15)"; r.style.opacity = "0"; }, 20);
         setTimeout(() => r.remove(), 1000);
@@ -880,56 +1649,163 @@
         setTimeout(() => t.remove(), 1200);
     }
 
-    function openFrogMenu() {
-        const list = document.getElementById('frogs-list');
-        list.innerHTML = state.myFrogs.length === 0 ? `<div class="text-center opacity-50 py-10">No frogs yet. Wait for a visitor!</div>` : '';
-        state.myFrogs.forEach(frog => {
-            const type = FROG_TYPES[frog.typeId];
-            const div = document.createElement('div');
-            div.className = 'bg-white/10 rounded-2xl p-4 mb-2 flex items-center gap-4';
-            div.innerHTML = `
-                <div class="w-16 h-16">${getFrogSVG(type, frog.isZelda)}</div>
-                <div class="flex-1">
-                    <div class="font-bold text-xl">${frog.name}</div>
-                    <div class="text-xs text-yellow-200 uppercase">${frog.isZelda ? 'Legendary' : type.species} • Bonus: ${type.bonusWeather}</div>
-                </div>
-                <div>
-                    ${frog.padIndex !== -1 ? `<button onclick="removeFromPond(${frog.id})" class="bg-red-500 px-4 py-2 rounded-xl font-bold">Recall</button>` : `<button onclick="startPlacement(${frog.id})" class="bg-yellow-500 text-green-900 px-4 py-2 rounded-xl font-bold">Place</button>`}
-                </div>`;
-            list.appendChild(div);
+    function switchCompendiumTab(tabName) {
+        state.activeCompendiumTab = tabName;
+        ['friends', 'decor', 'journal'].forEach(t => {
+            const btn = document.getElementById(`tab-btn-${t}`);
+            if (btn) {
+                if (t === tabName) {
+                    btn.className = "flex-1 py-2.5 rounded-xl font-bold bg-yellow-400 text-green-950 text-sm cursor-pointer transition-all";
+                } else {
+                    btn.className = "flex-1 py-2.5 rounded-xl font-bold bg-white/10 text-white text-sm cursor-pointer transition-all";
+                }
+            }
         });
-        document.getElementById('frog-menu-modal').style.display = 'flex';
+        renderCompendiumContent();
     }
 
-    function closeFrogMenu() { document.getElementById('frog-menu-modal').style.display = 'none'; }
+    function openFrogMenu() {
+        switchCompendiumTab(state.activeCompendiumTab);
+        const modal = document.getElementById('frog-menu-modal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeFrogMenu() { 
+        const modal = document.getElementById('frog-menu-modal');
+        if (modal) modal.style.display = 'none'; 
+    }
+
+    function renderCompendiumContent() {
+        const content = document.getElementById('compendium-content');
+        if (!content) return;
+        content.innerHTML = '';
+
+        if (state.activeCompendiumTab === 'friends') {
+            if (state.myFrogs.length === 0) {
+                content.innerHTML = `<div class="text-center opacity-50 py-10">No frogs yet. Wait for a visitor!</div>`;
+                return;
+            }
+            state.myFrogs.forEach(frog => {
+                const type = ALL_FROG_TYPES.find(t => t.id === frog.typeId) || ALL_FROG_TYPES[0];
+                const div = document.createElement('div');
+                div.className = 'bg-white/10 rounded-2xl p-4 mb-2 flex items-center gap-4';
+                div.innerHTML = `
+                    <div class="w-16 h-16">${getFrogSVG(type, frog.isZelda)}</div>
+                    <div class="flex-1">
+                        <div class="font-bold text-xl flex items-center gap-2">
+                            ${frog.name}
+                            ${type.isDLC ? '<span class="text-[10px] bg-yellow-400 text-black font-extrabold px-2 py-0.5 rounded-full">DLC</span>' : ''}
+                        </div>
+                        <div class="text-xs text-yellow-200 uppercase">${frog.isZelda ? 'Legendary' : type.species} • Bonus: ${type.bonusWeather}</div>
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="openRenameModal(${frog.id})" class="bg-blue-500 px-3 py-2 rounded-xl font-bold cursor-pointer text-xs pointer-events-auto">Rename</button>
+                        ${frog.padIndex !== -1 ? `<button onclick="removeFromPond(${frog.id})" class="bg-red-500 px-3 py-2 rounded-xl font-bold cursor-pointer text-xs pointer-events-auto">Recall</button>` : `<button onclick="startPlacement(${frog.id})" class="bg-yellow-500 text-green-900 px-3 py-2 rounded-xl font-bold cursor-pointer text-xs pointer-events-auto">Place</button>`}
+                    </div>`;
+                content.appendChild(div);
+            });
+        } else if (state.activeCompendiumTab === 'decor') {
+            const hasDecor = state.placedDecors.length > 0 || state.totems > 0;
+            if (!hasDecor) {
+                content.innerHTML = `<div class="text-center opacity-50 py-10">No decor items unlocked yet. Purchase lanterns in the DLC store or build Ancient Totems!</div>`;
+                return;
+            }
+
+            for (let i = 0; i < state.totems; i++) {
+                const div = document.createElement('div');
+                div.className = 'bg-white/10 rounded-2xl p-4 mb-3 flex items-center gap-4';
+                div.innerHTML = `
+                    <div class="text-4xl">🗿</div>
+                    <div class="flex-1">
+                        <div class="font-bold text-lg">Ancient Totem #${i + 1}</div>
+                        <div class="text-xs text-yellow-200">Passive generator (+8 Ribbits/sec)</div>
+                    </div>
+                `;
+                content.appendChild(div);
+            }
+
+            state.placedDecors.forEach((decor, idx) => {
+                const div = document.createElement('div');
+                div.className = 'bg-white/10 rounded-2xl p-4 mb-3 flex items-center gap-4';
+                let icon = '🏮';
+                let title = 'Lantern';
+                let bonus = '+25 Ribbits/sec';
+                if (decor.type === 'stonelantern') { icon = '🗿'; title = 'Stone Lantern'; bonus = '+40 Ribbits/sec'; }
+                else if (decor.type === 'rockstack') { icon = '🪨'; title = 'Zen Rock Stack'; bonus = '+60 Ribbits/sec'; }
+                else if (decor.type === 'windchime') { icon = '🎐'; title = 'Wind Chime'; bonus = '+100 Ribbits/sec'; }
+
+                div.innerHTML = `
+                    <div class="text-4xl">${icon}</div>
+                    <div class="flex-1">
+                        <div class="font-bold text-lg">${title} #${idx + 1}</div>
+                        <div class="text-xs text-yellow-200">${bonus} • Pos: (${Math.round(decor.x)}%, ${Math.round(decor.y)}%)</div>
+                    </div>
+                    <div>
+                        <button onclick="moveDecor(${decor.id})" class="bg-yellow-500 text-green-900 px-4 py-2 rounded-xl font-bold cursor-pointer text-xs pointer-events-auto">Move</button>
+                    </div>
+                `;
+                content.appendChild(div);
+            });
+        } else if (state.activeCompendiumTab === 'journal') {
+            const grid = document.createElement('div');
+            grid.className = 'grid grid-cols-2 gap-3';
+            
+            ALL_FROG_TYPES.forEach(type => {
+                const unlocked = state.myFrogs.some(f => f.typeId === type.id);
+                const item = document.createElement('div');
+                item.className = `p-3 rounded-2xl border flex items-center gap-3 ${unlocked ? 'bg-white/10 border-white/20' : 'bg-black/30 border-white/10 opacity-60'}`;
+                
+                if (unlocked) {
+                    item.innerHTML = `
+                        <div class="w-12 h-12">${getFrogSVG(type)}</div>
+                        <div class="flex-1 overflow-hidden">
+                            <div class="font-bold text-sm truncate">${type.species}</div>
+                            <div class="text-[10px] text-yellow-200 uppercase">${type.bonusWeather} (+${((type.bonusMult - 1)*100).toFixed(0)}%)</div>
+                        </div>
+                    `;
+                } else {
+                    item.innerHTML = `
+                        <div class="w-12 h-12 flex items-center justify-center bg-black/40 rounded-xl text-white/30 font-bold text-xl">?</div>
+                        <div class="flex-1 overflow-hidden">
+                            <div class="font-bold text-sm truncate text-white/50">??? Spirit</div>
+                            <div class="text-[10px] text-white/30 uppercase">Undiscovered</div>
+                        </div>
+                    `;
+                }
+                grid.appendChild(item);
+            });
+            content.appendChild(grid);
+        }
+    }
+
     function removeFromPond(frogId) {
-        const f = state.myFrogs.find(x => x.id === frogId);
-        if(f) f.padIndex = -1;
+        const frog = state.myFrogs.find(f => f.id === frogId);
+        if (frog) frog.padIndex = -1;
         refreshPondFrogs();
         openFrogMenu();
         updateUI();
     }
 
-    function initTitleDeco() {
-        const deco = document.getElementById('title-deco');
-        for(let i=0; i<15; i++) {
-            const leaf = document.createElement('div');
-            leaf.style.cssText = `position:absolute; width:40px; height:40px; background:#62b88e; border-radius:50% 0 50% 50%; left:${Math.random()*100}%; top:${Math.random()*100}%; opacity:${0.2 + Math.random()*0.3}; transform: rotate(${Math.random()*360}deg);`;
-            deco.appendChild(leaf);
-        }
-    }
-
     setInterval(() => {
         if (!state.gameStarted) return;
         let passive = state.totems * 8;
+        state.placedDecors.forEach(d => {
+            if (d.type === 'lantern') passive += 25;
+            else if (d.type === 'stonelantern') passive += 40;
+            else if (d.type === 'rockstack') passive += 60;
+            else if (d.type === 'windchime') passive += 100;
+        });
+
         state.myFrogs.forEach(f => { if (f.padIndex !== -1) passive += 1; });
-        if (passive > 0) gainRibbits((passive * state.mult * state.zenMult) / 20);
+        const ghBonus = state.greenhouseActive ? 1.5 : 1.0;
+        if (passive > 0) gainRibbits((passive * state.mult * state.zenMult * ghBonus) / 20);
 
         for (let i = 0; i < state.pads; i++) {
             const p = document.getElementById(`pad-${i}`);
             if (p && p.querySelectorAll('.frog-sprite').length === 0 && p.dataset.spawning !== 'true') {
                 p.dataset.spawning = 'true';
-                setTimeout(() => spawnWildFrog(i), 4000 + Math.random() * 8000);
+                const spawnDelay = state.ghPerks.mister > 0 ? 2500 + Math.random() * 4000 : 4000 + Math.random() * 8000;
+                setTimeout(() => spawnWildFrog(i), spawnDelay);
             }
         }
     }, 150);
@@ -937,8 +1813,98 @@
     window.onload = () => {
         pickRandomSubtitle();
         initTitleDeco();
+
+        const startBtn = document.getElementById('start-journey-btn');
+        if (startBtn) {
+            startBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                startGame();
+            });
+            startBtn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                startGame();
+            });
+        }
+
+        const autoSave = localStorage.getItem("frogfriends_save");
+        if (autoSave) {
+            try {
+                const parts = autoSave.split("|");
+                const decoded = JSON.parse(parts[0]);
+                state.ribbits = decoded.r || 0;
+                state.totalInEvo = decoded.t || 0;
+                state.evolution = decoded.e || 0;
+                state.pads = Math.max(1, decoded.p || 1);
+                state.padPositions = decoded.padPos || [];
+                state.clickLv = decoded.c || 1;
+                state.totems = decoded.o || 0;
+                state.mult = decoded.m || 1.0;
+                state.evoGoal = decoded.g || 100;
+                state.myFrogs = decoded.f || [];
+                state.dlcUnlocked = !!decoded.dlc;
+                state.greenhouseActive = !!decoded.gh;
+                state.ghPerks = decoded.perks || { orchid: 0, mister: 0 };
+                state.placedDecors = decoded.decors || [];
+
+                if (state.dlcUnlocked) {
+                    localStorage.setItem("dlc_greenhouse_unlocked", "true");
+                }
+                document.body.classList.toggle('theme-greenhouse', state.greenhouseActive);
+
+                const mainCluster = document.getElementById('main-cluster');
+                if (mainCluster) {
+                    const pad0 = document.getElementById('pad-0');
+                    if (pad0 && state.padPositions.length > 0 && state.padPositions[0].id === 0) {
+                        const rect = document.getElementById('pond-container').getBoundingClientRect();
+                        pad0.style.left = `${(state.padPositions[0].x / 100) * rect.width - 60}px`;
+                        pad0.style.top = `${(state.padPositions[0].y / 100) * rect.height - 50}px`;
+                    }
+
+                    for (let i = 1; i < state.pads; i++) {
+                        const savedPos = state.padPositions.find(p => p.id === i);
+                        if (!document.getElementById(`pad-${i}`)) {
+                            const pad = document.createElement('div');
+                            pad.className = 'lily-pad';
+                            pad.id = `pad-${i}`;
+                            const rect = document.getElementById('pond-container').getBoundingClientRect();
+                            const px = savedPos ? (savedPos.x / 100) * rect.width : (15 + Math.random() * 70) * rect.width / 100;
+                            const py = savedPos ? (savedPos.y / 100) * rect.height : (15 + Math.random() * 70) * rect.height / 100;
+                            pad.style.left = `${px - 60}px`;
+                            pad.style.top = `${py - 50}px`;
+                            pad.onclick = (e) => handlePadInteraction(i, e);
+                            mainCluster.appendChild(pad);
+                            if (!savedPos) {
+                                state.padPositions.push({ id: i, x: (px / rect.width) * 100, y: (py / rect.height) * 100 });
+                            }
+                        }
+                    }
+                }
+                if (state.greenhouseActive) {
+                    setupBotanicalEffects();
+                }
+                refreshPondFrogs();
+                refreshPondDecors();
+            } catch (e) {
+                console.error("Auto-load error", e);
+            }
+        } else {
+            const rect = document.getElementById('pond-container').getBoundingClientRect();
+            state.padPositions.push({ id: 0, x: 50, y: 50 });
+        }
+
         updateUI();
     };
+
+    function initTitleDeco() {
+        const deco = document.getElementById('title-deco');
+        if (!deco) return;
+        for(let i=0; i<15; i++) {
+            const leaf = document.createElement('div');
+            leaf.style.cssText = `position:absolute; width:40px; height:40px; background:#62b88e; border-radius:50% 0 50% 50%; left:${Math.random()*100}%; top:${Math.random()*100}%; opacity:${0.2 + Math.random()*0.3}; transform: rotate(${Math.random()*360}deg);`;
+            deco.appendChild(leaf);
+        }
+    }
 </script>
 </body>
 </html>
+```
