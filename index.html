@@ -180,8 +180,8 @@
         }
 
         .placed-decor {
-            position: absolute; width: 45px; height: 45px; cursor: pointer;
-            z-index: 25; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));
+            position: absolute; width: 65px; height: 65px; cursor: pointer;
+            z-index: 25; filter: drop-shadow(0 8px 12px rgba(0,0,0,0.4));
             transition: transform 0.2s; pointer-events: auto;
         }
         .placed-decor:hover { transform: scale(1.2); }
@@ -189,10 +189,30 @@
         @keyframes shake { 0%,100% { transform: translateX(0) scale(1.1); } 25% { transform: translateX(-5px) scale(1.1); } 75% { transform: translateX(5px) scale(1.1); } }
         @keyframes bobbing { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        .frog-sprite { width: 35px; height: 35px; cursor: pointer; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.2)); transition: transform 0.2s; pointer-events: auto; }
-        .frog-sprite:hover { transform: scale(1.25); }
+        /* RARITY ANIMATIONS & BADGES */
+        @keyframes aura-pulse { 0%,100% { filter: drop-shadow(0 0 4px #fbbf24); } 50% { filter: drop-shadow(0 0 14px #f59e0b); } }
+        @keyframes electric-zap { 0%,100% { filter: drop-shadow(0 0 4px #38bdf8); } 50% { filter: drop-shadow(0 0 12px #38bdf8); } }
+        @keyframes legendary-flame { 0%,100% { filter: drop-shadow(0 0 10px #f59e0b); } 50% { filter: drop-shadow(0 0 20px #ef4444); } }
+        @keyframes cosmic-glow { 0% { filter: drop-shadow(0 0 8px #c084fc); transform: scale(1); } 50% { filter: drop-shadow(0 0 22px #e879f9) drop-shadow(0 0 10px #38bdf8); transform: scale(1.05); } 100% { filter: drop-shadow(0 0 8px #c084fc); transform: scale(1); } }
+
+        .frog-sprite { width: 44px; height: 44px; cursor: pointer; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); transition: transform 0.2s; pointer-events: auto; }
+        .frog-sprite:hover { transform: scale(1.3); }
+        .frog-sprite.aura { animation: aura-pulse 2s infinite ease-in-out; }
+        .frog-sprite.electric { animation: electric-zap 0.8s infinite ease-in-out; }
+        .frog-sprite.legendary { animation: legendary-flame 1.5s infinite ease-in-out; }
+        .frog-sprite.cosmic { animation: cosmic-glow 2s infinite ease-in-out; }
+
         .wild-frog { animation: hop-wild 2s ease-in-out infinite; }
-        @keyframes hop-wild { 0%,100% { transform: scale(1); } 50% { transform: scale(1.1) translateY(-5px); } }
+        @keyframes hop-wild { 0%,100% { transform: scale(1); } 50% { transform: scale(1.15) translateY(-6px); } }
+
+        .rarity-tag {
+            font-size: 0.62rem; padding: 2px 6px; border-radius: 9999px; text-transform: uppercase; font-weight: 800; letter-spacing: 0.5px; display: inline-block;
+        }
+        .rarity-pond { background: #64748b; color: white; }
+        .rarity-rainforest { background: #10b981; color: white; }
+        .rarity-legendary { background: linear-gradient(135deg, #f59e0b, #ef4444); color: white; box-shadow: 0 0 6px #f59e0b; }
+        .rarity-cosmic { background: linear-gradient(135deg, #c084fc, #38bdf8, #f472b6); color: white; box-shadow: 0 0 10px #c084fc; }
+        .rarity-dlc { background: linear-gradient(135deg, #10b981, #fde047); color: #064e3b; box-shadow: 0 0 8px #fde047; }
 
         .modal-overlay {
             position: fixed; inset: 0; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px);
@@ -200,7 +220,7 @@
         }
         .modal-content, .admin-panel {
             background: #4fac82; border: 4px solid #fde047; border-radius: 30px;
-            padding: 28px; max-width: 580px; width: 92%; text-align: center;
+            padding: 28px; max-width: 620px; width: 92%; text-align: center;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); pointer-events: auto;
         }
         .admin-panel { background: #1e2937; }
@@ -309,13 +329,21 @@
                 <div id="evo-desc" class="text-xs opacity-75 max-w-xs italic leading-tight mt-1">A quiet, humble beginning.</div>
             </div>
 
-            <!-- TOP RIGHT: ASCENSION BAR -->
-            <div class="absolute top-8 right-10 flex flex-col items-end ui-element">
-                <div class="text-[11px] font-bold opacity-80 mb-1 tracking-widest uppercase">Pond Ascension Level: <span id="evo-level">0</span></div>
-                <div class="w-64 h-3 bg-black/30 rounded-full overflow-hidden border border-white/20">
-                    <div id="evo-bar" class="h-full bg-gradient-to-r from-yellow-200 to-yellow-500 transition-all duration-700" style="width: 0%"></div>
+            <!-- TOP RIGHT: ASCENSION BAR & EXPEDITIONS -->
+            <div class="absolute top-8 right-10 flex flex-col items-end ui-element gap-2">
+                <div class="flex items-center gap-3">
+                    <button onclick="openExpeditionsModal()" class="bg-yellow-400/20 hover:bg-yellow-400/30 border border-yellow-300/50 px-4 py-2 rounded-full text-xs font-bold text-yellow-300 backdrop-blur-md flex items-center gap-2 cursor-pointer pointer-events-auto transition-all">
+                        <span>🗺️ Pond Expeditions</span>
+                        <span id="expedition-badge" class="bg-emerald-500 text-white px-1.5 py-0.2 rounded-full text-[10px] hidden">Ready</span>
+                    </button>
+                    <div class="flex flex-col items-end">
+                        <div class="text-[11px] font-bold opacity-80 mb-1 tracking-widest uppercase">Pond Ascension Level: <span id="evo-level">0</span></div>
+                        <div class="w-64 h-3 bg-black/30 rounded-full overflow-hidden border border-white/20">
+                            <div id="evo-bar" class="h-full bg-gradient-to-r from-yellow-200 to-yellow-500 transition-all duration-700" style="width: 0%"></div>
+                        </div>
+                        <div class="text-xs mt-1 font-bold" id="evo-goal">Goal: 100</div>
+                    </div>
                 </div>
-                <div class="text-xs mt-1 font-bold" id="evo-goal">Goal: 100</div>
             </div>
 
             <!-- SPIRIT REALM TRIGGER -->
@@ -361,6 +389,25 @@
     </div>
 </div>
 
+<!-- EXPEDITIONS MODAL -->
+<div id="expeditions-modal" class="modal-overlay">
+    <div class="modal-content !max-w-2xl text-left">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-3xl font-bold text-yellow-300 flex items-center gap-2">
+                <span>🗺️</span> Pond Expeditions
+            </h2>
+            <button onclick="closeExpeditionsModal()" class="text-3xl opacity-60 hover:opacity-100 cursor-pointer">&times;</button>
+        </div>
+        <p class="text-xs text-yellow-200 mb-4">Send your frog friends out into the mystic forest and misty streams on active expeditions to forage for rare treasures, ancient seeds, and permanent multiplier boosts!</p>
+        
+        <div id="expeditions-list" class="space-y-3 max-h-[380px] overflow-y-auto pr-1"></div>
+
+        <div class="flex justify-end mt-4">
+            <button onclick="closeExpeditionsModal()" class="px-6 py-3 bg-gray-600 rounded-xl font-bold cursor-pointer pointer-events-auto">Close</button>
+        </div>
+    </div>
+</div>
+
 <!-- DLC EXPANSION STORE MODAL -->
 <div id="dlc-modal" class="modal-overlay">
     <div class="modal-content !max-w-xl text-left">
@@ -373,7 +420,7 @@
 
         <div class="bg-black/30 rounded-2xl p-4 mb-4 border border-emerald-400/30">
             <p class="text-sm text-emerald-100 mb-2">
-                Transform your peaceful marsh into a lush, sunlit botanical sanctuary! Includes misty glass aesthetics, warm sunbeams, terrarium lily pads, and <strong>5 exclusive Botanical Frog Spirits</strong>.
+                Transform your peaceful marsh into a lush, sunlit botanical sanctuary! Includes misty glass aesthetics, warm sunbeams, terrarium lily pads, and <strong>exclusive DLC Rarity Frog Spirits</strong>.
             </p>
             <div id="dlc-ownership-status" class="mt-2 text-xs font-bold uppercase tracking-wider text-yellow-300">
                 Status: Locked
@@ -383,7 +430,7 @@
         <!-- UNLOCK / ACTIVATION SECTION -->
         <div id="dlc-lock-section" class="space-y-4 mb-6">
             <div class="bg-emerald-950/40 p-4 rounded-xl border border-emerald-500/20">
-                <label class="block text-xs uppercase opacity-80 mb-1 text-emerald-200">Enter License Key</label>
+                <label class="block text-xs uppercase opacity-80 mb-1 text-emerald-200">Enter Licence Key</label>
                 <div class="flex gap-2">
                     <input type="text" id="dlc-key-input" class="flex-1 bg-black/40 border border-emerald-400/40 rounded-xl p-3 text-white text-center font-mono text-sm uppercase" placeholder="e.g. GREENHOUSE2026">
                     <button onclick="activateDLCKey()" class="bg-yellow-400 text-emerald-950 font-bold px-6 rounded-xl hover:bg-yellow-300 transition-colors cursor-pointer pointer-events-auto">Activate</button>
@@ -406,7 +453,7 @@
                 </button>
             </div>
 
-            <!-- BOTANICAL TERRARIUM PERKS & DECORATIONS -->
+            <!-- BOTANICAL TERRARIUM PERKS & REDESIGNED DECOR SHOP -->
             <div class="text-sm font-bold text-yellow-300 uppercase tracking-wider mt-4 mb-2">Botanical Terrarium & Decor Shop</div>
             <div class="grid grid-cols-1 gap-3 max-h-[220px] overflow-y-auto pr-1">
                 <div class="botanical-item">
@@ -475,6 +522,34 @@
         <div class="flex gap-3 mt-6">
             <button onclick="closeLoadModal()" class="flex-1 py-3 bg-gray-600 rounded-2xl font-bold cursor-pointer pointer-events-auto">Cancel</button>
             <button onclick="loadGame()" class="flex-1 py-3 bg-yellow-400 text-green-900 font-bold rounded-2xl cursor-pointer pointer-events-auto">Load & Restore Progress</button>
+        </div>
+    </div>
+</div>
+
+<!-- WARDROBE / CLOTHING MODAL -->
+<div id="wardrobe-modal" class="modal-overlay">
+    <div class="modal-content !max-w-xl text-left">
+        <div class="flex justify-between items-center mb-4">
+            <h2 class="text-3xl font-bold text-yellow-300 flex items-center gap-2">
+                <span>🎩</span> Frog Wardrobe
+            </h2>
+            <button onclick="closeWardrobeModal()" class="text-3xl opacity-60 hover:opacity-100 cursor-pointer">&times;</button>
+        </div>
+        <p class="text-xs text-yellow-200 mb-4">Dress up your frog friend in gorgeous artisan clothing! Outfits boost passive Ribbit generation and make your frogs look dashing.</p>
+        
+        <div id="wardrobe-frog-info" class="bg-black/30 p-3 rounded-xl mb-4 flex items-center gap-3">
+            <div id="wardrobe-frog-avatar" class="w-14 h-14"></div>
+            <div>
+                <div id="wardrobe-frog-name" class="font-bold text-lg">Frog Name</div>
+                <div id="wardrobe-frog-species" class="text-xs text-yellow-200">Species</div>
+            </div>
+        </div>
+
+        <div class="text-xs font-bold uppercase tracking-wider text-yellow-300 mb-2">Available Outfits & Accessories</div>
+        <div id="outfits-list" class="space-y-3 max-h-[280px] overflow-y-auto pr-1"></div>
+
+        <div class="flex justify-end mt-4">
+            <button onclick="closeWardrobeModal()" class="px-6 py-3 bg-gray-600 rounded-xl font-bold cursor-pointer pointer-events-auto">Done</button>
         </div>
     </div>
 </div>
@@ -548,7 +623,7 @@
 
 <!-- COMPENDIUM MODAL -->
 <div id="frog-menu-modal" class="modal-overlay">
-    <div class="modal-content !max-w-2xl text-left">
+    <div class="modal-content !max-w-3xl text-left">
         <div class="flex justify-between items-center mb-4">
             <h2 class="text-3xl font-bold">Compendium</h2>
             <button onclick="closeFrogMenu()" class="text-4xl opacity-50 hover:opacity-100 cursor-pointer pointer-events-auto">&times;</button>
@@ -561,7 +636,20 @@
             <button id="tab-btn-journal" onclick="switchCompendiumTab('journal')" class="flex-1 py-2.5 rounded-xl font-bold bg-white/10 text-white text-sm cursor-pointer transition-all">Journal</button>
         </div>
 
-        <div id="compendium-content" class="max-h-[380px] overflow-y-auto pr-1"></div>
+        <!-- JOURNAL FILTER DROPDOWN -->
+        <div id="journal-filter-wrapper" class="mb-4 hidden flex items-center justify-between bg-black/30 px-4 py-2 rounded-xl">
+            <span class="text-xs uppercase tracking-wider text-yellow-300 font-bold">Filter Journal by Rarity:</span>
+            <select id="journal-rarity-select" onchange="renderCompendiumContent()" class="bg-black/60 border border-white/30 rounded-lg px-3 py-1 text-sm text-white font-bold outline-none cursor-pointer">
+                <option value="ALL">All Rarities</option>
+                <option value="Pond">Pond (Common)</option>
+                <option value="Rainforest">Rainforest (Uncommon)</option>
+                <option value="Legendary">Legendary</option>
+                <option value="Cosmic">Cosmic (Insane)</option>
+                <option value="DLC">DLC Exclusive</option>
+            </select>
+        </div>
+
+        <div id="compendium-content" class="max-h-[360px] overflow-y-auto pr-1"></div>
     </div>
 </div>
 
@@ -571,9 +659,15 @@
     const PHRASES = [
         "Totoro-lly awesome!", "Peaceful hopping", "The water is fine", "Zen ripples", 
         "Spirit of the pond", "Leap of faith", "Don't worry, be hoppy", "Lily pad lounging", 
-        "Ribbiting adventure", "Botanical vibes"
+        "Ribbiting adventure", "Botanical vibes", "Hop to it!", "Croak and cozy", "Lily pad luxury", "Pond-er the possibilities", "Toad-ally serene", 
+        "Amphibious adventures", "Green and serene", "Fly-catching frenzy", "Misty morning melodies", "Bullfrog bounce"
     ];
-    const BANNED_TERMS = ['fuck', 'shit', 'ass', 'bitch', 'cunt', 'dick', 'pussy', 'nigger', 'faggot', 'cock', 'bastard', 'slut', 'whore'];
+    
+    const BANNED_TERMS = [
+        'fuck', 'shit', 'ass', 'bitch', 'cunt', 'dick', 'pussy', 'nigger', 'faggot', 'cock', 'bastard', 'slut', 'whore',
+        'nigga', 'niga', 'fag', 'retard', 'tranny', 'chink', 'spic', 'kike', 'motherfucker', 'twat', 'dickhead', 'asshole'
+    ];
+
     const SPIRIT_NAMES = ["Komorebi", "Susuwatari", "Kodama", "Teto", "Yubaba", "Calcifer", "Jiji", "Haku", "Boh", "Neko", "Zen", "Mochi", "Soot", "Moss", "Rain", "Dew", "Leaf", "Mist", "Spirit", "Monstera", "Fern", "Flora"];
     const EVO_PREFIXES = ["Silent", "Dappled", "Golden", "Radiant", "Mist-Bound", "Eternal", "Hallowed", "Dancing", "Prismatic", "Abyssal", "Starlit", "Whispering", "Velvet", "Glimmering"];
     const EVO_NOUN = ["Marsh", "Reeds", "Valley", "Grotto", "Sanctuary", "Waters", "Spring", "Lagoon", "Hollow", "Glade", "Zenith", "Reflection", "Basin", "Meadow"];
@@ -584,33 +678,106 @@
 
     const VALID_DLC_KEYS = ["CODE14", "ARTHUR28", "UAREGAY", "LEBRON92", "DLCCODE", "ZELDA"];
 
-    const FROG_TYPES = Array.from({ length: 50 }, (_, i) => ({
-        id: i,
-        species: `Frog Spirit #${i + 1}`,
-        color: ['#86efac', '#f87171', '#60a5fa', '#fbbf24', '#c084fc', '#f472b6', '#ffffff', '#4ade80'][i % 8],
-        bonusWeather: ['idle', 'rain', 'snow', 'lightning'][i % 4],
-        bonusMult: 1.1 + (i * 0.05),
-        pattern: i % 3 === 0 ? 'dots' : i % 3 === 1 ? 'stripes' : 'none',
-        isDLC: false
-    }));
-
-    const GREENHOUSE_FROG_TYPES = [
-        { id: 1001, species: "Monstera Frog", color: "#10b981", bonusWeather: "idle", bonusMult: 1.8, pattern: "leaf", isDLC: true },
-        { id: 1002, species: "Fern Sprout", color: "#34d399", bonusWeather: "rain", bonusMult: 2.0, pattern: "sprout", isDLC: true },
-        { id: 1003, species: "Orchid Spirit", color: "#e879f9", bonusWeather: "idle", bonusMult: 2.2, pattern: "petal", isDLC: true },
-        { id: 1004, species: "Succulent Hopper", color: "#22d3ee", bonusWeather: "snow", bonusMult: 2.5, pattern: "dots", isDLC: true },
-        { id: 1005, species: "Terrarium Toad", color: "#fbbf24", bonusWeather: "idle", bonusMult: 3.0, pattern: "crystal", isDLC: true }
+    // --- WARDROBE OUTFITS CATALOGUE ---
+    const OUTFITS = [
+        { id: 'none', name: 'Natural (No Outfit)', cost: 0, bonusRibbits: 0, svgOverlay: '' },
+        { id: 'top_hat', name: 'Dapper Top Hat', cost: 1000, bonusRibbits: 5, svgOverlay: '<path d="M35 22 L65 22 L62 8 L38 8 Z" fill="#1e293b"/><rect x="30" y="22" width="40" height="4" fill="#0f172a" rx="2"/><rect x="38" y="15" width="24" height="3" fill="#ef4444"/>' },
+        { id: 'wizard', name: 'Mystic Wizard Hat', cost: 2500, bonusRibbits: 12, svgOverlay: '<polygon points="50,2 32,25 68,25" fill="#7c3aed"/><ellipse cx="50" cy="25" rx="20" ry="4" fill="#6d28d9"/><circle cx="50" cy="15" r="2" fill="#fde047"/><circle cx="44" cy="20" r="1.5" fill="#38bdf8"/>' },
+        { id: 'bow_tie', name: 'Gentleman Bow Tie', cost: 800, bonusRibbits: 4, svgOverlay: '<path d="M42 62 L32 55 L32 69 Z" fill="#dc2626"/><path d="M58 62 L68 55 L68 69 Z" fill="#dc2626"/><circle cx="50" cy="62" r="4" fill="#991b1b"/>' },
+        { id: 'flower_crown', name: 'Spring Flower Crown', cost: 1800, bonusRibbits: 8, svgOverlay: '<circle cx="36" cy="22" r="5" fill="#f472b6"/><circle cx="50" cy="18" r="5" fill="#facc15"/><circle cx="64" cy="22" r="5" fill="#38bdf8"/><path d="M32 26 Q50 32 68 26" fill="none" stroke="#22c55e" stroke-width="3"/>' },
+        { id: 'crown', name: 'Royal Golden Crown', cost: 10000, bonusRibbits: 40, svgOverlay: '<polygon points="35,22 40,10 50,18 60,10 65,22" fill="#facc15"/><rect x="35" y="22" width="30" height="5" fill="#ca8a04" rx="2"/><circle cx="40" cy="16" r="2" fill="#ef4444"/><circle cx="50" cy="15" r="2.5" fill="#38bdf8"/><circle cx="60" cy="16" r="2" fill="#10b981"/>' },
+        { id: 'scarf', name: 'Cozy Winter Scarf', cost: 3500, bonusRibbits: 15, svgOverlay: '<path d="M30 58 Q50 68 70 58 L65 78 Q50 82 35 78 Z" fill="#3b82f6"/><rect x="42" y="62" width="16" height="18" fill="#1d4ed8" rx="2"/>' }
     ];
 
-    const ALL_FROG_TYPES = [...FROG_TYPES, ...GREENHOUSE_FROG_TYPES];
+    // --- EXPANDED 90+ FROG ROSTER ---
+    const ALL_FROG_TYPES = [
+        { id: 1, species: "Mossy Marshhopper", rarity: "Pond", typeCat: "Amphibian", colour: "#4ade80", bonusWeather: "idle", bonusMult: 1.1, pattern: "dots", effectClass: "none", isDLC: false },
+        { id: 2, species: "Dewdrop Hopper", rarity: "Pond", typeCat: "Amphibian", colour: "#38bdf8", bonusWeather: "rain", bonusMult: 1.15, pattern: "dots", effectClass: "none", isDLC: false },
+        { id: 3, species: "Buttercup Bouncer", rarity: "Pond", typeCat: "Amphibian", colour: "#facc15", bonusWeather: "idle", bonusMult: 1.2, pattern: "stripes", effectClass: "none", isDLC: false },
+        { id: 4, species: "Pebble Jumper", rarity: "Pond", typeCat: "Amphibian", colour: "#94a3b8", bonusWeather: "snow", bonusMult: 1.25, pattern: "none", effectClass: "none", isDLC: false },
+        { id: 5, species: "Reed Hopper", rarity: "Pond", typeCat: "Amphibian", colour: "#a3e635", bonusWeather: "idle", bonusMult: 1.3, pattern: "stripes", effectClass: "none", isDLC: false },
+        { id: 6, species: "Muddy Puddleswimmer", rarity: "Pond", typeCat: "Amphibian", colour: "#b45309", bonusWeather: "rain", bonusMult: 1.35, pattern: "none", effectClass: "none", isDLC: false },
+        { id: 7, species: "Cattail Croaker", rarity: "Pond", typeCat: "Amphibian", colour: "#65a30d", bonusWeather: "idle", bonusMult: 1.4, pattern: "dots", effectClass: "none", isDLC: false },
+        { id: 8, species: "Ripple Glider", rarity: "Pond", typeCat: "Amphibian", colour: "#0ea5e9", bonusWeather: "rain", bonusMult: 1.45, pattern: "stripes", effectClass: "none", isDLC: false },
+        { id: 9, species: "Lily Pad Lounger", rarity: "Pond", typeCat: "Amphibian", colour: "#22c55e", bonusWeather: "idle", bonusMult: 1.5, pattern: "none", effectClass: "none", isDLC: false },
+        { id: 10, species: "Soggy Backpacker", rarity: "Pond", typeCat: "Amphibian", colour: "#78716c", bonusWeather: "snow", bonusMult: 1.55, pattern: "dots", effectClass: "none", isDLC: false },
+        { id: 11, species: "Silt Swimmer", rarity: "Pond", typeCat: "Amphibian", colour: "#a1a1aa", bonusWeather: "rain", bonusMult: 1.6, pattern: "stripes", effectClass: "none", isDLC: false },
+        { id: 12, species: "Dusk Dancer", rarity: "Pond", typeCat: "Amphibian", colour: "#64748b", bonusWeather: "idle", bonusMult: 1.65, pattern: "dots", effectClass: "none", isDLC: false },
+        { id: 13, species: "Clover Leaper", rarity: "Pond", typeCat: "Amphibian", colour: "#84cc16", bonusWeather: "idle", bonusMult: 1.7, pattern: "leaf", effectClass: "none", isDLC: false },
+        { id: 14, species: "Brook Bouncer", rarity: "Pond", typeCat: "Amphibian", colour: "#38bdf8", bonusWeather: "rain", bonusMult: 1.75, pattern: "dots", effectClass: "none", isDLC: false },
+        { id: 15, species: "Marshland Musician", rarity: "Pond", typeCat: "Amphibian", colour: "#10b981", bonusWeather: "idle", bonusMult: 1.8, pattern: "stripes", effectClass: "none", isDLC: false },
+        { id: 16, species: "Pondside Prowler", rarity: "Pond", typeCat: "Amphibian", colour: "#059669", bonusWeather: "snow", bonusMult: 1.85, pattern: "dots", effectClass: "none", isDLC: false },
+        { id: 17, species: "Willow Wanderer", rarity: "Pond", typeCat: "Amphibian", colour: "#4ade80", bonusWeather: "idle", bonusMult: 1.9, pattern: "leaf", effectClass: "none", isDLC: false },
+        { id: 18, species: "Algae Acrobat", rarity: "Pond", typeCat: "Amphibian", colour: "#16a34a", bonusWeather: "rain", bonusMult: 1.95, pattern: "dots", effectClass: "none", isDLC: false },
+        { id: 19, species: "Riverbank Runner", rarity: "Pond", typeCat: "Amphibian", colour: "#ca8a04", bonusWeather: "idle", bonusMult: 2.0, pattern: "stripes", effectClass: "none", isDLC: false },
+        { id: 20, species: "Quiet Quagmire Frog", rarity: "Pond", typeCat: "Amphibian", colour: "#71717a", bonusWeather: "snow", bonusMult: 2.05, pattern: "none", effectClass: "none", isDLC: false },
 
-    const ZELDA_FROG = {
-        id: 999999,
-        typeId: 0,
-        name: "Link",
-        padIndex: -1,
-        isZelda: true
-    };
+        // --- RAINFOREST (Uncommon) ---
+        { id: 21, species: "Poison Dart Spirit", rarity: "Rainforest", typeCat: "Amphibian", colour: "#ef4444", bonusWeather: "rain", bonusMult: 2.2, pattern: "dots", effectClass: "none", isDLC: false },
+        { id: 22, species: "Emerald Canopy Frog", rarity: "Rainforest", typeCat: "Amphibian", colour: "#059669", bonusWeather: "idle", bonusMult: 2.3, pattern: "leaf", effectClass: "none", isDLC: false },
+        { id: 23, species: "Azure Treefrog", rarity: "Rainforest", typeCat: "Amphibian", colour: "#2563eb", bonusWeather: "snow", bonusMult: 2.4, pattern: "stripes", effectClass: "none", isDLC: false },
+        { id: 24, species: "Golden Mantella", rarity: "Rainforest", typeCat: "Amphibian", colour: "#f59e0b", bonusWeather: "idle", bonusMult: 2.5, pattern: "crystal", effectClass: "none", isDLC: false },
+        { id: 25, species: "Amethyst Tree Spirit", rarity: "Rainforest", typeCat: "Amphibian", colour: "#9333ea", bonusWeather: "rain", bonusMult: 2.6, pattern: "dots", effectClass: "none", isDLC: false },
+        { id: 26, species: "Sapphire Leaper", rarity: "Rainforest", typeCat: "Amphibian", colour: "#1d4ed8", bonusWeather: "rain", bonusMult: 2.7, pattern: "stripes", effectClass: "none", isDLC: false },
+        { id: 27, species: "Red-Eyed Litter Hopper", rarity: "Rainforest", typeCat: "Amphibian", colour: "#16a34a", bonusWeather: "idle", bonusMult: 2.8, pattern: "leaf", effectClass: "none", isDLC: false },
+        { id: 28, species: "Bromeliad Baby", rarity: "Rainforest", typeCat: "Amphibian", colour: "#84cc16", bonusWeather: "rain", bonusMult: 2.9, pattern: "dots", effectClass: "none", isDLC: false },
+        { id: 29, species: "Tangerine Jumper", rarity: "Rainforest", typeCat: "Amphibian", colour: "#ea580c", bonusWeather: "idle", bonusMult: 3.0, pattern: "stripes", effectClass: "none", isDLC: false },
+        { id: 30, species: "Canopy Glider", rarity: "Rainforest", typeCat: "Amphibian", colour: "#0d9488", bonusWeather: "snow", bonusMult: 3.1, pattern: "crystal", effectClass: "none", isDLC: false },
+        { id: 31, species: "Neon Rainforest Sprite", rarity: "Rainforest", typeCat: "Amphibian", colour: "#ec4899", bonusWeather: "rain", bonusMult: 3.2, pattern: "dots", effectClass: "aura", isDLC: false },
+        { id: 32, species: "Velvet Jungle Dweller", rarity: "Rainforest", typeCat: "Amphibian", colour: "#312e81", bonusWeather: "idle", bonusMult: 3.3, pattern: "stripes", effectClass: "none", isDLC: false },
+        { id: 33, species: "Sunburst Climber", rarity: "Rainforest", typeCat: "Amphibian", colour: "#fb923c", bonusWeather: "idle", bonusMult: 3.4, pattern: "crystal", effectClass: "aura", isDLC: false },
+        { id: 34, species: "Stormbound Arboreal", rarity: "Rainforest", typeCat: "Amphibian", colour: "#0284c7", bonusWeather: "snow", bonusMult: 3.5, pattern: "lightning", effectClass: "electric", isDLC: false },
+        { id: 35, species: "Ghostly Canopy Wanderer", rarity: "Rainforest", typeCat: "Amphibian", colour: "#e2e8f0", bonusWeather: "rain", bonusMult: 3.6, pattern: "petal", effectClass: "aura", isDLC: false },
+        { id: 36, species: "Bioluminescent Shroomfrog", rarity: "Rainforest", typeCat: "Mushroom", colour: "#10b981", bonusWeather: "rain", bonusMult: 3.7, pattern: "shroom", effectClass: "aura", isDLC: false },
+        { id: 37, species: "Crimson Spore Hopper", rarity: "Rainforest", typeCat: "Mushroom", colour: "#dc2626", bonusWeather: "idle", bonusMult: 3.8, pattern: "shroom", effectClass: "aura", isDLC: false },
+        { id: 38, species: "Azure Crystal Jumper", rarity: "Rainforest", typeCat: "Amphibian", colour: "#38bdf8", bonusWeather: "snow", bonusMult: 3.9, pattern: "crystal", effectClass: "electric", isDLC: false },
+        { id: 39, species: "Shadow Jungle Stalker", rarity: "Rainforest", typeCat: "Amphibian", colour: "#334155", bonusWeather: "idle", bonusMult: 4.0, pattern: "dots", effectClass: "none", isDLC: false },
+        { id: 40, species: "Glimmering Forest Sprite", rarity: "Rainforest", typeCat: "Amphibian", colour: "#34d399", bonusWeather: "rain", bonusMult: 4.1, pattern: "stripes", effectClass: "aura", isDLC: false },
+        { id: 41, species: "Amber Fossil Jumper", rarity: "Rainforest", typeCat: "Amphibian", colour: "#d97706", bonusWeather: "idle", bonusMult: 4.2, pattern: "crystal", effectClass: "none", isDLC: false },
+        { id: 42, species: "Midnight Glowfrog", rarity: "Rainforest", typeCat: "Amphibian", colour: "#a855f7", bonusWeather: "snow", bonusMult: 4.3, pattern: "dots", effectClass: "aura", isDLC: false },
+        { id: 43, species: "Twilight Shaman Frog", rarity: "Rainforest", typeCat: "Mystic", colour: "#6d28d9", bonusWeather: "idle", bonusMult: 4.5, pattern: "stars", effectClass: "aura", isDLC: false },
+        { id: 44, species: "Frostbite Oracle Frog", rarity: "Rainforest", typeCat: "Mystic", colour: "#0284c7", bonusWeather: "snow", bonusMult: 4.7, pattern: "crystal", effectClass: "electric", isDLC: false },
+        { id: 45, species: "Magma Core Jumper", rarity: "Rainforest", typeCat: "Elemental", colour: "#b91c1c", bonusWeather: "idle", bonusMult: 4.9, pattern: "crystal", effectClass: "legendary", isDLC: false },
+        { id: 46, species: "Gale Force Spirit Frog", rarity: "Rainforest", typeCat: "Elemental", colour: "#6ee7b7", bonusWeather: "rain", bonusMult: 5.1, pattern: "lightning", effectClass: "electric", isDLC: false },
+        { id: 47, species: "Abyssal Trench Swimmer", rarity: "Rainforest", typeCat: "Mystic", colour: "#1e1b4b", bonusWeather: "idle", bonusMult: 5.3, pattern: "stars", effectClass: "aura", isDLC: false },
+        { id: 48, species: "Golden Lotus Warden", rarity: "Rainforest", typeCat: "Floral", colour: "#fbbf24", bonusWeather: "rain", bonusMult: 5.5, pattern: "petal", effectClass: "aura", isDLC: false },
+        { id: 49, species: "Void Weaver Frog", rarity: "Rainforest", typeCat: "Mystic", colour: "#581c87", bonusWeather: "idle", bonusMult: 5.7, pattern: "galaxy", effectClass: "aura", isDLC: false },
+        { id: 50, species: "Thunderclap Jumper", rarity: "Rainforest", typeCat: "Elemental", colour: "#facc15", bonusWeather: "snow", bonusMult: 6.0, pattern: "lightning", effectClass: "electric", isDLC: false },
+        { id: 51, species: "Mossy Canopy Jumper", rarity: "Rainforest", typeCat: "Amphibian", colour: "#15803d", bonusWeather: "idle", bonusMult: 6.2, pattern: "leaf", effectClass: "none", isDLC: false },
+        { id: 52, species: "Emerald Glade Spirit", rarity: "Rainforest", typeCat: "Amphibian", colour: "#10b981", bonusWeather: "rain", bonusMult: 6.4, pattern: "dots", effectClass: "none", isDLC: false },
+        { id: 53, species: "Jade Tree Leaper", rarity: "Rainforest", typeCat: "Amphibian", colour: "#047857", bonusWeather: "idle", bonusMult: 6.6, pattern: "stripes", effectClass: "none", isDLC: false },
+        { id: 54, species: "River Mist Hopper", rarity: "Rainforest", typeCat: "Amphibian", colour: "#06b6d4", bonusWeather: "rain", bonusMult: 6.8, pattern: "dots", effectClass: "none", isDLC: false },
+        { id: 55, species: "Hollow Log Whistler", rarity: "Rainforest", typeCat: "Amphibian", colour: "#78350f", bonusWeather: "idle", bonusMult: 7.0, pattern: "none", effectClass: "none", isDLC: false },
+        { id: 56, species: "Fern Frond Hopper", rarity: "Rainforest", typeCat: "Amphibian", colour: "#22c55e", bonusWeather: "snow", bonusMult: 7.2, pattern: "leaf", effectClass: "none", isDLC: false },
+        { id: 57, species: "Vine Climber Frog", rarity: "Rainforest", typeCat: "Amphibian", colour: "#65a30d", bonusWeather: "idle", bonusMult: 7.4, pattern: "stripes", effectClass: "none", isDLC: false },
+        { id: 58, species: "Orchid Petal Stalker", rarity: "Rainforest", typeCat: "Floral", colour: "#f472b6", bonusWeather: "rain", bonusMult: 7.6, pattern: "petal", effectClass: "aura", isDLC: false },
+        { id: 59, species: "Sunlit Canopy Glider", rarity: "Rainforest", typeCat: "Amphibian", colour: "#fbbf24", bonusWeather: "idle", bonusMult: 7.8, pattern: "crystal", effectClass: "none", isDLC: false },
+        { id: 60, species: "Deep Jungle Mystic", rarity: "Rainforest", typeCat: "Mystic", colour: "#4c1d95", bonusWeather: "snow", bonusMult: 8.0, pattern: "stars", effectClass: "aura", isDLC: false },
+
+        // --- LEGENDARY ---
+        { id: 61, species: "Grand Phoenix Frog", rarity: "Legendary", typeCat: "Mythical", colour: "#ef4444", bonusWeather: "idle", bonusMult: 12.0, pattern: "crystal", effectClass: "legendary", isDLC: false },
+        { id: 62, species: "Ancient Dragon Spirit Frog", rarity: "Legendary", typeCat: "Mythical", colour: "#047857", bonusWeather: "rain", bonusMult: 15.0, pattern: "stars", effectClass: "legendary", isDLC: false },
+        { id: 63, species: "Celestial Guardian Frog", rarity: "Legendary", typeCat: "Mythical", colour: "#4338ca", bonusWeather: "idle", bonusMult: 18.0, pattern: "galaxy", effectClass: "legendary", isDLC: false },
+        { id: 64, species: "World Tree Dryad Frog", rarity: "Legendary", typeCat: "Mythical", colour: "#15803d", bonusWeather: "snow", bonusMult: 22.0, pattern: "leaf", effectClass: "legendary", isDLC: false },
+        { id: 65, species: "Solar Flare Deity", rarity: "Legendary", typeCat: "Mythical", colour: "#f59e0b", bonusWeather: "idle", bonusMult: 26.0, pattern: "crystal", effectClass: "legendary", isDLC: false },
+        { id: 66, species: "Lunar Eclipse Sovereign", rarity: "Legendary", typeCat: "Mythical", colour: "#312e81", bonusWeather: "rain", bonusMult: 30.0, pattern: "stars", effectClass: "legendary", isDLC: false },
+
+        // --- COSMIC (INSANE RARITY) ---
+        { id: 67, species: "Starlit Nebula Frog", rarity: "Cosmic", typeCat: "Cosmic", colour: "#818cf8", bonusWeather: "idle", bonusMult: 45.0, pattern: "stars", effectClass: "cosmic", isDLC: false },
+        { id: 68, species: "Void Singularity Spirit", rarity: "Cosmic", typeCat: "Cosmic", colour: "#c084fc", bonusWeather: "idle", bonusMult: 65.0, pattern: "galaxy", effectClass: "cosmic", isDLC: false },
+        { id: 69, species: "Supernova Flare Hopper", rarity: "Cosmic", typeCat: "Cosmic", colour: "#f43f5e", bonusWeather: "idle", bonusMult: 90.0, pattern: "crystal", effectClass: "cosmic", isDLC: false },
+        { id: 70, species: "Interstellar Horizon Jumper", rarity: "Cosmic", typeCat: "Cosmic", colour: "#38bdf8", bonusWeather: "snow", bonusMult: 120.0, pattern: "galaxy", effectClass: "cosmic", isDLC: false },
+
+        // --- BOTANICAL GREENHOUSE DLC FROGS ---
+        { id: 1001, species: "Monstera Terrarium Frog", rarity: "DLC", typeCat: "Botanical", colour: "#10b981", bonusWeather: "idle", bonusMult: 3.0, pattern: "leaf", effectClass: "none", isDLC: true },
+        { id: 1002, species: "Fern Sprout Spirit", rarity: "DLC", typeCat: "Botanical", colour: "#34d399", bonusWeather: "rain", bonusMult: 3.5, pattern: "sprout", effectClass: "none", isDLC: true },
+        { id: 1003, species: "Orchid Blossom Frog", rarity: "DLC", typeCat: "Botanical", colour: "#e879f9", bonusWeather: "idle", bonusMult: 4.5, pattern: "petal", effectClass: "aura", isDLC: true },
+        { id: 1004, species: "Succulent Terrarium Hopper", rarity: "DLC", typeCat: "Botanical", colour: "#22d3ee", bonusWeather: "snow", bonusMult: 5.5, pattern: "dots", effectClass: "none", isDLC: true },
+        { id: 1005, species: "Bioluminescent Lotus King", rarity: "DLC", typeCat: "Botanical", colour: "#fbbf24", bonusWeather: "idle", bonusMult: 10.0, pattern: "crystal", effectClass: "legendary", isDLC: true },
+        { id: 1006, species: "Prism Greenhouse Master", rarity: "DLC", typeCat: "Botanical", colour: "#f472b6", bonusWeather: "idle", bonusMult: 25.0, pattern: "rainbow", effectClass: "cosmic", isDLC: true },
+        { id: 1007, species: "Glasshouse Guardian Frog", rarity: "DLC", typeCat: "Botanical", colour: "#2dd4bf", bonusWeather: "rain", bonusMult: 35.0, pattern: "crystal", effectClass: "legendary", isDLC: true },
+        { id: 1008, species: "Botanical Zenith Monarch", rarity: "DLC", typeCat: "Botanical", colour: "#fde047", bonusWeather: "idle", bonusMult: 75.0, pattern: "galaxy", effectClass: "cosmic", isDLC: true }
+    ];
 
     let state = {
         ribbits: 0,
@@ -626,6 +793,7 @@
         zenMode: false,
         weather: 'idle',
         myFrogs: [],
+        unlockedOutfits: ['none'],
         currentCatch: null,
         placingFrogId: null,
         gameStarted: false,
@@ -638,11 +806,19 @@
         placingDecorType: null,
         activeCompendiumTab: 'friends',
         renamingFrogId: null,
-        movingDecorId: null
+        wardrobeFrogId: null,
+        movingDecorId: null,
+        expeditions: [
+            { id: 'exp_misty_woods', title: 'Misty Woods Foraging', desc: 'Send a frog to search ancient pine needles for hidden Ribbits and seeds.', durationSec: 30, rewardRibbits: 1200, rewardMultBonus: 0.1, activeFrogId: null, startTime: 0 },
+            { id: 'exp_crystal_springs', title: 'Crystal Springs Dive', desc: 'Dive deep into crystal eddies for legendary crystal shards.', durationSec: 90, rewardRibbits: 8500, rewardMultBonus: 0.3, activeFrogId: null, startTime: 0 },
+            { id: 'exp_celestial_glade', title: 'Celestial Glade Stargaze', desc: 'Journey to the cosmic plateau for cosmic energy surges.', durationSec: 300, rewardRibbits: 45000, rewardMultBonus: 0.8, activeFrogId: null, startTime: 0 }
+        ]
     };
 
-    function getFrogSVG(type, isZelda = false) {
+    function getFrogSVG(type, outfitId = 'none', isZelda = false) {
         if (!type) type = ALL_FROG_TYPES[0];
+        const outfit = OUTFITS.find(o => o.id === outfitId) || OUTFITS[0];
+
         if (isZelda) {
             return `<svg viewBox="0 0 100 100" style="width:100%; height:100%;">
                 <ellipse cx="50" cy="52" rx="34" ry="32" fill="#60a5fa" stroke="#1e40af" stroke-width="4"/>
@@ -650,35 +826,52 @@
                 <circle cx="62" cy="38" r="11" fill="#fcd34d"/>
                 <circle cx="38" cy="38" r="5" fill="#1e3a8a"/>
                 <circle cx="62" cy="38" r="5" fill="#1e3a8a"/>
-                <path d="M30 65 Q50 78 70 65" fill="none" stroke="#1e3a8a" stroke-width="4" stroke-linecap="round"/>
+                <path d="M30 65 Q50 78 70 65" fill="none" stroke="#1e40af" stroke-width="4" stroke-linecap="round"/>
                 <path d="M25 25 Q50 12 75 25" fill="#fcd34d" opacity="0.9"/>
+                ${outfit.svgOverlay}
             </svg>`;
         }
 
         let patternSvg = '';
         if (type.pattern === 'dots') {
-            patternSvg = `<circle cx="35" cy="40" r="3" fill="white" opacity="0.4"/><circle cx="65" cy="40" r="3" fill="white" opacity="0.4"/>`;
+            patternSvg = `<circle cx="35" cy="40" r="3" fill="white" opacity="0.5"/><circle cx="65" cy="40" r="3" fill="white" opacity="0.5"/>`;
         } else if (type.pattern === 'stripes') {
-            patternSvg = `<rect x="30" y="45" width="40" height="2" fill="white" opacity="0.3"/><rect x="30" y="55" width="40" height="2" fill="white" opacity="0.3"/>`;
+            patternSvg = `<rect x="30" y="45" width="40" height="2" fill="white" opacity="0.4"/><rect x="30" y="55" width="40" height="2" fill="white" opacity="0.4"/>`;
         } else if (type.pattern === 'leaf') {
-            patternSvg = `<path d="M50 40 Q45 50 50 60 Q55 50 50 40 Z" fill="#047857" opacity="0.6"/>`;
+            patternSvg = `<path d="M50 40 Q45 50 50 60 Q55 50 50 40 Z" fill="#047857" opacity="0.7"/>`;
         } else if (type.pattern === 'sprout') {
             patternSvg = `<path d="M50 35 Q40 25 50 20 Q60 25 50 35 Z" fill="#a7f3d0"/>`;
         } else if (type.pattern === 'petal') {
-            patternSvg = `<circle cx="50" cy="45" r="5" fill="#f472b6" opacity="0.8"/>`;
+            patternSvg = `<circle cx="50" cy="45" r="5" fill="#f472b6" opacity="0.9"/>`;
         } else if (type.pattern === 'crystal') {
-            patternSvg = `<polygon points="50,38 55,48 45,48" fill="#fde047" opacity="0.8"/>`;
+            patternSvg = `<polygon points="50,38 56,48 44,48" fill="#fde047" opacity="0.9"/>`;
+        } else if (type.pattern === 'stars') {
+            patternSvg = `<polygon points="50,35 52,40 57,40 53,43 55,48 50,45 45,48 47,43 43,40 48,40" fill="#fef08a"/>`;
+        } else if (type.pattern === 'shroom') {
+            patternSvg = `<path d="M45 48 C45 40 55 40 55 48 Z" fill="#ffffff"/><path d="M40 42 C40 35 60 35 60 42 Z" fill="#ef4444"/>`;
+        } else if (type.pattern === 'lightning') {
+            patternSvg = `<polygon points="52,35 44,45 50,45 46,55 56,43 50,43" fill="#fde047"/>`;
+        } else if (type.pattern === 'rainbow') {
+            patternSvg = `<circle cx="50" cy="50" r="12" fill="none" stroke="#f472b6" stroke-width="2"/><circle cx="50" cy="50" r="8" fill="none" stroke="#60a5fa" stroke-width="2"/>`;
+        } else if (type.pattern === 'galaxy') {
+            patternSvg = `<ellipse cx="50" cy="50" rx="16" ry="6" fill="none" stroke="#e879f9" stroke-width="2" transform="rotate(-20 50 50)"/>`;
         }
 
         return `<svg viewBox="0 0 100 100" style="width:100%; height:100%;">
-            <ellipse cx="50" cy="55" rx="35" ry="30" fill="${type.color}" stroke="rgba(0,0,0,0.1)" stroke-width="2"/>
-            <circle cx="35" cy="35" r="10" fill="${type.color}"/>
-            <circle cx="65" cy="35" r="10" fill="${type.color}"/>
+            <ellipse cx="50" cy="55" rx="35" ry="30" fill="${type.colour}" stroke="rgba(0,0,0,0.15)" stroke-width="2"/>
+            <circle cx="35" cy="35" r="10" fill="${type.colour}"/>
+            <circle cx="65" cy="35" r="10" fill="${type.colour}"/>
             <circle cx="35" cy="35" r="4" fill="white"/><circle cx="35" cy="35" r="1.5" fill="black"/>
             <circle cx="65" cy="35" r="4" fill="white"/><circle cx="65" cy="35" r="1.5" fill="black"/>
-            <path d="M35 70 Q50 80 65 70" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="3" stroke-linecap="round"/>
+            <path d="M35 70 Q50 80 65 70" fill="none" stroke="rgba(0,0,0,0.25)" stroke-width="3" stroke-linecap="round"/>
             ${patternSvg}
+            ${outfit.svgOverlay}
         </svg>`;
+    }
+
+    function getRarityBadge(rarity) {
+        const cls = `rarity-${(rarity || 'pond').toLowerCase()}`;
+        return `<span class="rarity-tag ${cls}">${rarity || 'Pond'}</span>`;
     }
 
     function resetGameState() {
@@ -695,11 +888,13 @@
         state.zenMode = false;
         state.weather = 'idle';
         state.myFrogs = [];
+        state.unlockedOutfits = ['none'];
         state.currentCatch = null;
         state.placingFrogId = null;
         state.isPlacingPad = false;
         state.lastTapTime = 0;
         state.placedDecors = [];
+        state.expeditions.forEach(ex => { ex.activeFrogId = null; ex.startTime = 0; });
 
         document.querySelectorAll('.lily-pad').forEach((pad, index) => {
             if (index > 0) pad.remove();
@@ -749,7 +944,7 @@
         return `${p} ${n}`;
     }
 
-    function generateEvoColor(level) {
+    function generateEvoColour(level) {
         const hue1 = (140 + (level * 25)) % 360;
         const hue2 = (hue1 + 40) % 360;
         return [`hsl(${hue1}, 50%, 80%)`, `hsl(${hue2}, 40%, 45%)`];
@@ -765,6 +960,214 @@
             const icon = document.getElementById('fs-icon');
             if (icon) icon.innerHTML = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path>';
         }
+    }
+
+    function openExpeditionsModal() {
+        renderExpeditionsList();
+        const modal = document.getElementById('expeditions-modal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeExpeditionsModal() {
+        const modal = document.getElementById('expeditions-modal');
+        if (modal) modal.style.display = 'none';
+    }
+
+    function renderExpeditionsList() {
+        const listEl = document.getElementById('expeditions-list');
+        if (!listEl) return;
+        listEl.innerHTML = '';
+
+        const now = Date.now();
+        let readyCount = 0;
+
+        state.expeditions.forEach(ex => {
+            const active = ex.activeFrogId !== null;
+            let elapsed = active ? Math.floor((now - ex.startTime) / 1000) : 0;
+            const finished = active && elapsed >= ex.durationSec;
+            if (finished) readyCount++;
+            const pct = active ? Math.min(100, (elapsed / ex.durationSec) * 100) : 0;
+
+            const frog = active ? state.myFrogs.find(f => f.id === ex.activeFrogId) : null;
+            const frogType = frog ? ALL_FROG_TYPES.find(t => t.id === frog.typeId) : null;
+
+            const item = document.createElement('div');
+            item.className = "bg-white/10 rounded-2xl p-4 border border-white/20 flex flex-col gap-3";
+            
+            let actionHtml = '';
+            if (!active) {
+                const idleFrogs = state.myFrogs.filter(f => f.padIndex !== -1 && !state.expeditions.some(e => e.activeFrogId === f.id));
+                if (idleFrogs.length === 0) {
+                    actionHtml = `<div class="text-xs text-yellow-300 font-bold">Place frog friends on lily pads first to send them on expeditions!</div>`;
+                } else {
+                    let options = idleFrogs.map(f => {
+                        const t = ALL_FROG_TYPES.find(tp => tp.id === f.typeId);
+                        return `<option value="${f.id}">${f.name} (${t ? t.species : 'Frog'})</option>`;
+                    }).join('');
+                    actionHtml = `
+                        <div class="flex gap-2 items-center">
+                            <select id="select-frog-${ex.id}" class="bg-black/40 border border-white/30 rounded-xl px-3 py-2 text-xs text-white font-bold outline-none flex-1">
+                                ${options}
+                            </select>
+                            <button onclick="startExpedition('${ex.id}')" class="bg-yellow-400 text-emerald-950 font-bold px-5 py-2 rounded-xl text-xs hover:bg-yellow-300 cursor-pointer pointer-events-auto">Send Frog</button>
+                        </div>
+                    `;
+                }
+            } else if (!finished) {
+                const remaining = Math.max(0, ex.durationSec - elapsed);
+                const mins = Math.floor(remaining / 60);
+                const secs = remaining % 60;
+                actionHtml = `
+                    <div class="flex flex-col gap-1">
+                        <div class="flex justify-between text-xs text-emerald-200">
+                            <span>Exploring with ${frog ? frog.name : 'Frog'}...</span>
+                            <span>Time remaining: ${mins}:${secs < 10 ? '0' : ''}${secs}</span>
+                        </div>
+                        <div class="h-2 bg-black/40 rounded-full overflow-hidden border border-white/20">
+                            <div class="h-full bg-yellow-400 transition-all duration-500" style="width: ${pct}%"></div>
+                        </div>
+                    </div>
+                `;
+            } else {
+                actionHtml = `
+                    <div class="flex justify-between items-center bg-emerald-900/40 p-3 rounded-xl border border-emerald-400/40">
+                        <div class="text-xs font-bold text-yellow-300">🎉 Expedition Completed! Reward ready!</div>
+                        <button onclick="claimExpedition('${ex.id}')" class="bg-yellow-400 text-emerald-950 font-bold px-6 py-2 rounded-xl text-xs hover:bg-yellow-300 cursor-pointer pointer-events-auto animate-bounce">Claim Reward</button>
+                    </div>
+                `;
+            }
+
+            item.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <div class="font-bold text-lg text-white">${ex.title}</div>
+                    <div class="text-xs font-bold text-yellow-300">+${ex.rewardRibbits.toLocaleString()} 🐸 & +${ex.rewardMultBonus}x Mult</div>
+                </div>
+                <div class="text-xs text-emerald-100">${ex.desc}</div>
+                ${actionHtml}
+            `;
+            listEl.appendChild(item);
+        });
+
+        const badge = document.getElementById('expedition-badge');
+        if (badge) {
+            if (readyCount > 0) {
+                badge.innerText = `${readyCount} Ready!`;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
+        }
+    }
+
+    function startExpedition(expId) {
+        const selectEl = document.getElementById(`select-frog-${expId}`);
+        if (!selectEl) return;
+        const frogId = parseInt(selectEl.value);
+        const ex = state.expeditions.find(e => e.id === expId);
+        if (!ex || !frogId) return;
+
+        ex.activeFrogId = frogId;
+        ex.startTime = Date.now();
+        renderExpeditionsList();
+        showToast("🗺️ Expedition launched!");
+    }
+
+    function claimExpedition(expId) {
+        const ex = state.expeditions.find(e => e.id === expId);
+        if (!ex) return;
+
+        ex.activeFrogId = null;
+        ex.startTime = 0;
+        gainRibbits(ex.rewardRibbits);
+        state.mult += ex.rewardMultBonus;
+
+        renderExpeditionsList();
+        updateUI();
+        showToast(`🎉 Expedition Claimed! +${ex.rewardRibbits.toLocaleString()} Ribbits & +${ex.rewardMultBonus}x Multiplier!`);
+    }
+
+    function openWardrobe(frogId) {
+        state.wardrobeFrogId = frogId;
+        closeFrogMenu();
+        renderWardrobeModal();
+        const modal = document.getElementById('wardrobe-modal');
+        if (modal) modal.style.display = 'flex';
+    }
+
+    function closeWardrobeModal() {
+        state.wardrobeFrogId = null;
+        const modal = document.getElementById('wardrobe-modal');
+        if (modal) modal.style.display = 'none';
+        openFrogMenu();
+    }
+
+    function renderWardrobeModal() {
+        const frog = state.myFrogs.find(f => f.id === state.wardrobeFrogId);
+        if (!frog) return;
+        const type = ALL_FROG_TYPES.find(t => t.id === frog.typeId) || ALL_FROG_TYPES[0];
+
+        const avatar = document.getElementById('wardrobe-frog-avatar');
+        if (avatar) avatar.innerHTML = getFrogSVG(type, frog.outfitId || 'none', frog.isZelda);
+
+        const nameEl = document.getElementById('wardrobe-frog-name');
+        if (nameEl) nameEl.innerText = frog.name;
+        const specEl = document.getElementById('wardrobe-frog-species');
+        if (specEl) specEl.innerText = `${type.species} (${type.rarity})`;
+
+        const listEl = document.getElementById('outfits-list');
+        if (!listEl) return;
+        listEl.innerHTML = '';
+
+        OUTFITS.forEach(outfit => {
+            const unlocked = state.unlockedOutfits.includes(outfit.id);
+            const equipped = (frog.outfitId || 'none') === outfit.id;
+
+            const div = document.createElement('div');
+            div.className = "bg-white/10 rounded-2xl p-3 border border-white/20 flex items-center gap-3";
+
+            let btnHtml = '';
+            if (equipped) {
+                btnHtml = `<span class="bg-emerald-600 text-white font-bold px-4 py-2 rounded-xl text-xs">Equipped</span>`;
+            } else if (unlocked) {
+                btnHtml = `<button onclick="equipOutfit('${outfit.id}')" class="bg-yellow-400 text-emerald-950 font-bold px-4 py-2 rounded-xl text-xs hover:bg-yellow-300 cursor-pointer pointer-events-auto">Equip</button>`;
+            } else {
+                btnHtml = `<button onclick="buyOutfit('${outfit.id}')" class="bg-yellow-500 text-green-950 font-bold px-4 py-2 rounded-xl text-xs hover:bg-yellow-400 cursor-pointer pointer-events-auto">${outfit.cost.toLocaleString()} 🐸</button>`;
+            }
+
+            div.innerHTML = `
+                <div class="w-12 h-12 bg-black/20 rounded-xl flex items-center justify-center p-1">
+                    <svg viewBox="0 0 100 100" style="width:100%; height:100%;">
+                        <ellipse cx="50" cy="55" rx="35" ry="30" fill="${type.colour}"/>
+                        ${outfit.svgOverlay}
+                    </svg>
+                </div>
+                <div class="flex-1">
+                    <div class="font-bold text-white text-sm">${outfit.name}</div>
+                    <div class="text-[10px] text-yellow-200">+${outfit.bonusRibbits} Ribbits/sec passive</div>
+                </div>
+                <div>${btnHtml}</div>
+            `;
+            listEl.appendChild(div);
+        });
+    }
+
+    function buyOutfit(outfitId) {
+        const outfit = OUTFITS.find(o => o.id === outfitId);
+        if (!outfit || state.ribbits < outfit.cost) return;
+        state.ribbits -= outfit.cost;
+        state.unlockedOutfits.push(outfitId);
+        equipOutfit(outfitId);
+        updateUI();
+    }
+
+    function equipOutfit(outfitId) {
+        const frog = state.myFrogs.find(f => f.id === state.wardrobeFrogId);
+        if (!frog) return;
+        frog.outfitId = outfitId;
+        renderWardrobeModal();
+        refreshPondFrogs();
+        updateUI();
+        showToast("🎩 Outfit equipped!");
     }
 
     function openDLCModal() {
@@ -943,16 +1346,44 @@
             
             if (decor.type === 'lantern') {
                 el.title = 'Terrarium Lantern';
-                el.innerHTML = `<svg viewBox="0 0 50 50" style="width:100%; height:100%; filter: drop-shadow(0 0 8px #fde047);"><circle cx="25" cy="25" r="15" fill="#fde047" opacity="0.85"/><path d="M20 10 L30 10 L35 20 L15 20 Z" fill="#b45309"/><rect x="23" y="5" width="4" height="5" fill="#78350f"/></svg>`;
+                el.innerHTML = `<svg viewBox="0 0 100 100" style="width:100%; height:100%; filter: drop-shadow(0 0 10px #fde047);">
+                    <path d="M40 70 L60 70 L65 95 L35 95 Z" fill="#78350f"/>
+                    <path d="M30 40 L70 40 L75 70 L25 70 Z" fill="#10b981" opacity="0.9"/>
+                    <rect x="42" y="48" width="16" height="16" fill="#fde047" rx="3" style="filter: drop-shadow(0 0 8px #fde047);"/>
+                    <path d="M35 40 L50 20 L65 40 Z" fill="#047857"/>
+                    <circle cx="50" cy="18" r="4" fill="#fbbf24"/>
+                </svg>`;
             } else if (decor.type === 'stonelantern') {
                 el.title = 'Stone Lantern';
-                el.innerHTML = `<svg viewBox="0 0 50 50" style="width:100%; height:100%;"><rect x="18" y="15" width="14" height="25" fill="#71717a" rx="3"/><path d="M12 15 L25 5 L38 15 Z" fill="#52525b"/><rect x="21" y="20" width="8" height="10" fill="#fde047" opacity="0.8"/></svg>`;
+                el.innerHTML = `<svg viewBox="0 0 100 100" style="width:100%; height:100%;">
+                    <ellipse cx="50" cy="92" rx="22" ry="6" fill="#52525b"/>
+                    <rect x="42" y="45" width="16" height="42" fill="#71717a" rx="4"/>
+                    <path d="M30 45 L50 28 L70 45 Z" fill="#3f3f46"/>
+                    <path d="M36 28 L50 16 L64 28 Z" fill="#52525b"/>
+                    <rect x="44" y="55" width="12" height="18" fill="#fde047" rx="2" style="filter: drop-shadow(0 0 6px #fde047);"/>
+                    <circle cx="50" cy="13" r="3" fill="#a1a1aa"/>
+                </svg>`;
             } else if (decor.type === 'rockstack') {
                 el.title = 'Zen Rock Stack';
-                el.innerHTML = `<svg viewBox="0 0 50 50" style="width:100%; height:100%;"><ellipse cx="25" cy="40" rx="18" ry="8" fill="#71717a"/><ellipse cx="25" cy="28" rx="13" ry="7" fill="#a1a1aa"/><ellipse cx="25" cy="18" rx="8" ry="5" fill="#d4d4d8"/></svg>`;
+                el.innerHTML = `<svg viewBox="0 0 100 100" style="width:100%; height:100%;">
+                    <ellipse cx="50" cy="85" rx="30" ry="12" fill="#52525b"/>
+                    <ellipse cx="50" cy="72" rx="24" ry="14" fill="#71717a"/>
+                    <ellipse cx="48" cy="54" rx="18" ry="12" fill="#a1a1aa"/>
+                    <ellipse cx="52" cy="38" rx="12" ry="9" fill="#d4d4d8"/>
+                    <circle cx="52" cy="28" r="6" fill="#f4f4f5"/>
+                    <path d="M35 75 Q40 65 38 60" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round"/>
+                </svg>`;
             } else if (decor.type === 'windchime') {
-                el.title = 'Wind Chime';
-                el.innerHTML = `<svg viewBox="0 0 50 50" style="width:100%; height:100%;"><path d="M25 5 L25 40 M15 15 L35 15 M18 25 L32 25" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/><circle cx="25" cy="3" r="3" fill="#fbbf24"/></svg>`;
+                el.title = 'Bamboo Wind Chime';
+                el.innerHTML = `<svg viewBox="0 0 100 100" style="width:100%; height:100%; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3));">
+                    <path d="M50 10 L50 85" stroke="#78350f" stroke-width="4" stroke-linecap="round"/>
+                    <ellipse cx="50" cy="18" rx="22" ry="8" fill="#d97706"/>
+                    <rect x="30" y="30" width="6" height="40" fill="#f59e0b" rx="2"/>
+                    <rect x="42" y="36" width="6" height="48" fill="#fbbf24" rx="2"/>
+                    <rect x="54" y="28" width="6" height="35" fill="#d97706" rx="2"/>
+                    <rect x="66" y="34" width="6" height="42" fill="#fcd34d" rx="2"/>
+                    <polygon points="50,90 42,78 58,78" fill="#ef4444"/>
+                </svg>`;
             }
             mainCluster.appendChild(el);
         });
@@ -979,7 +1410,7 @@
         } else {
             inputEl.classList.add('input-error');
             setTimeout(() => inputEl.classList.remove('input-error'), 400);
-            showToast("❌ Invalid DLC Key");
+            showToast("❌ Invalid Licence Key");
         }
     }
 
@@ -1044,14 +1475,24 @@
     }
 
     function updateUI() {
-        const frogBonusMult = state.myFrogs.reduce((acc, f) => {
+        const placedFrogs = state.myFrogs.filter(f => f.padIndex !== -1);
+        const speciesCounts = {};
+        placedFrogs.forEach(f => {
+            speciesCounts[f.typeId] = (speciesCounts[f.typeId] || 0) + 1;
+        });
+        let synergyBonus = 1.0;
+        Object.values(speciesCounts).forEach(count => {
+            if (count >= 2) synergyBonus += (count - 1) * 0.15;
+        });
+
+        const frogBonusMult = placedFrogs.reduce((acc, f) => {
             const type = ALL_FROG_TYPES.find(t => t.id === f.typeId) || ALL_FROG_TYPES[0];
-            const active = (type.bonusWeather === state.weather || type.bonusWeather === 'idle') && f.padIndex !== -1;
+            const active = (type.bonusWeather === state.weather || type.bonusWeather === 'idle');
             return acc + (active ? type.bonusMult - 1 : 0);
         }, 1);
 
         const greenhouseMultiplier = state.greenhouseActive ? 1.5 : 1.0;
-        const totalMult = state.mult * state.zenMult * frogBonusMult * greenhouseMultiplier;
+        const totalMult = state.mult * state.zenMult * frogBonusMult * greenhouseMultiplier * synergyBonus;
 
         const scoreEl = document.getElementById('score');
         if (scoreEl) scoreEl.innerText = Math.floor(state.ribbits).toLocaleString();
@@ -1089,6 +1530,7 @@
         if (btnTotem) btnTotem.disabled = state.ribbits < tCost;
 
         updateDLCModalUI();
+        renderExpeditionsList();
     }
 
     function gainRibbits(amt) {
@@ -1105,7 +1547,7 @@
         state.mult += 0.3 + (state.evolution * 0.08);
         
         if (!state.greenhouseActive) {
-            const pair = generateEvoColor(state.evolution);
+            const pair = generateEvoColour(state.evolution);
             const pondContainer = document.getElementById('pond-container');
             if (pondContainer) {
                 pondContainer.style.setProperty('--bg-top', pair[0]);
@@ -1187,7 +1629,7 @@
 
     function saveGame() {
         const saveData = { 
-            v: 2, 
+            v: 3, 
             r: Math.floor(state.ribbits), 
             t: state.totalInEvo, 
             e: state.evolution, 
@@ -1198,10 +1640,12 @@
             m: state.mult, 
             g: state.evoGoal, 
             f: state.myFrogs,
+            outfits: state.unlockedOutfits,
             dlc: state.dlcUnlocked,
             gh: state.greenhouseActive,
             perks: state.ghPerks,
-            decors: state.placedDecors
+            decors: state.placedDecors,
+            expeditions: state.expeditions
         };
         const jsonStr = JSON.stringify(saveData);
         const checksum = jsonStr.split('').reduce((a, c) => a + c.charCodeAt(0), 0) % 999999;
@@ -1259,10 +1703,12 @@
             state.mult = decoded.m || 1.0;
             state.evoGoal = decoded.g || 100;
             state.myFrogs = decoded.f || [];
+            state.unlockedOutfits = decoded.outfits || ['none'];
             state.dlcUnlocked = !!decoded.dlc;
             state.greenhouseActive = !!decoded.gh;
             state.ghPerks = decoded.perks || { orchid: 0, mister: 0 };
             state.placedDecors = decoded.decors || [];
+            if (decoded.expeditions) state.expeditions = decoded.expeditions;
 
             if (state.dlcUnlocked) {
                 localStorage.setItem("dlc_greenhouse_unlocked", "true");
@@ -1327,9 +1773,9 @@
         const input = document.getElementById('admin-frogs');
         const count = input ? parseInt(input.value) || 1 : 1;
         for (let i = 0; i < count; i++) {
-            const pool = state.greenhouseActive ? ALL_FROG_TYPES : FROG_TYPES;
+            const pool = (state.greenhouseActive && state.dlcUnlocked) ? ALL_FROG_TYPES : ALL_FROG_TYPES.filter(f => !f.isDLC);
             const type = pool[Math.floor(Math.random() * pool.length)];
-            state.myFrogs.push({ id: Date.now() + i, typeId: type.id, name: SPIRIT_NAMES[Math.floor(Math.random() * SPIRIT_NAMES.length)], padIndex: -1 });
+            state.myFrogs.push({ id: Date.now() + i, typeId: type.id, name: SPIRIT_NAMES[Math.floor(Math.random() * SPIRIT_NAMES.length)], padIndex: -1, outfitId: 'none' });
         }
         updateUI();
     }
@@ -1373,8 +1819,14 @@
             }
             return;
         }
+        const placedFrogs = state.myFrogs.filter(f => f.padIndex !== -1);
+        const speciesCounts = {};
+        placedFrogs.forEach(f => { speciesCounts[f.typeId] = (speciesCounts[f.typeId] || 0) + 1; });
+        let synergyBonus = 1.0;
+        Object.values(speciesCounts).forEach(count => { if (count >= 2) synergyBonus += (count - 1) * 0.15; });
+
         const ghBonus = state.greenhouseActive ? 1.5 : 1.0;
-        const power = 5 * Math.pow(1.5, state.clickLv - 1) * state.mult * ghBonus;
+        const power = 5 * Math.pow(1.5, state.clickLv - 1) * state.mult * ghBonus * synergyBonus;
         gainRibbits(power);
         if (e && e.clientX) {
             spawnText(e.clientX, e.clientY, `+${Math.floor(power)}`);
@@ -1387,12 +1839,25 @@
         const pad = document.getElementById(`pad-${padIdx}`);
         if (!pad || pad.querySelectorAll('.frog-sprite').length > 0) return;
         
-        const pool = (state.greenhouseActive && state.dlcUnlocked) ? ALL_FROG_TYPES : FROG_TYPES;
+        const availablePool = ALL_FROG_TYPES.filter(f => {
+            if (f.isDLC && !state.dlcUnlocked) return false;
+            return true;
+        });
+
+        const rand = Math.random() * 100;
+        let targetRarity = "Pond";
+        if (rand > 99.0) targetRarity = "Cosmic";
+        else if (rand > 93.0) targetRarity = "Legendary";
+        else if (rand > 65.0) targetRarity = "Rainforest";
+        else targetRarity = "Pond";
+
+        let pool = availablePool.filter(f => f.rarity === targetRarity);
+        if (pool.length === 0) pool = availablePool;
         const type = pool[Math.floor(Math.random() * pool.length)];
 
         const frogEl = document.createElement('div');
-        frogEl.className = 'frog-sprite wild-frog';
-        frogEl.innerHTML = getFrogSVG(type);
+        frogEl.className = `frog-sprite wild-frog ${type.effectClass || ''}`;
+        frogEl.innerHTML = getFrogSVG(type, 'none');
         frogEl.onclick = (e) => { e.stopPropagation(); initiateCatch(type, padIdx); };
         pad.appendChild(frogEl);
         pad.dataset.spawning = 'false';
@@ -1401,11 +1866,11 @@
     function initiateCatch(type, padIdx) {
         state.currentCatch = { type, padIdx };
         const disp = document.getElementById('catch-display');
-        if (disp) disp.innerHTML = `<div class="w-32 h-32 mx-auto">${getFrogSVG(type)}</div>`;
+        if (disp) disp.innerHTML = `<div class="w-32 h-32 mx-auto ${type.effectClass || ''}">${getFrogSVG(type, 'none')}</div>`;
         const nameEl = document.getElementById('catch-name');
         if (nameEl) nameEl.innerText = type.species;
         const statsEl = document.getElementById('catch-stats');
-        if (statsEl) statsEl.innerText = `${type.isDLC ? '🪴 DLC EXCLUSIVE • ' : ''}Bonus: ${type.bonusWeather.toUpperCase()} (+${((type.bonusMult - 1) * 100).toFixed(0)}%)`;
+        if (statsEl) statsEl.innerHTML = `Type: <strong>${type.typeCat}</strong> • Rarity: ${getRarityBadge(type.rarity)}<br>Bonus: ${type.bonusWeather.toUpperCase()} (+${((type.bonusMult - 1) * 100).toFixed(0)}%)`;
         const inputEl = document.getElementById('frog-name-input');
         if (inputEl) inputEl.value = "";
         const modal = document.getElementById('catch-modal');
@@ -1424,7 +1889,7 @@
         }
         const finalName = inputName || (state.currentCatch ? state.currentCatch.type.species : "Spirit");
         if (state.currentCatch) {
-            state.myFrogs.push({ id: Date.now(), typeId: state.currentCatch.type.id, name: finalName, padIndex: -1 });
+            state.myFrogs.push({ id: Date.now(), typeId: state.currentCatch.type.id, name: finalName, padIndex: -1, outfitId: 'none' });
             const pad = document.getElementById(`pad-${state.currentCatch.padIdx}`);
             if (pad) {
                 const wild = pad.querySelector('.wild-frog');
@@ -1506,9 +1971,9 @@
                 const pad = document.getElementById(`pad-${f.padIndex}`);
                 if (pad) {
                     const sprite = document.createElement('div');
-                    sprite.className = 'frog-sprite';
                     const frogType = ALL_FROG_TYPES.find(t => t.id === f.typeId) || ALL_FROG_TYPES[0];
-                    sprite.innerHTML = getFrogSVG(frogType, f.isZelda);
+                    sprite.className = `frog-sprite ${frogType.effectClass || ''}`;
+                    sprite.innerHTML = getFrogSVG(frogType, f.outfitId || 'none', f.isZelda);
                     sprite.title = f.name;
                     pad.appendChild(sprite);
                 }
@@ -1562,13 +2027,13 @@
         if (!fishLayer) return;
         fishLayer.innerHTML = '';
         
-        const koiColors = ['#f97316', '#fbbf24', '#f43f5e', '#ffffff'];
+        const koiColours = ['#f97316', '#fbbf24', '#f43f5e', '#ffffff'];
         
         for (let i = 0; i < 5; i++) {
             const koi = document.createElement('div');
             koi.className = 'spirit-koi';
             
-            const color = koiColors[i % koiColors.length];
+            const colour = koiColours[i % koiColours.length];
             const topPos = 15 + Math.random() * 70;
             const duration = 14 + Math.random() * 12;
             const delay = -(Math.random() * duration);
@@ -1581,9 +2046,9 @@
             
             koi.innerHTML = `
                 <svg viewBox="0 0 120 60" style="width: 90px; height: 45px;">
-                    <path d="M110 30 Q90 10 50 25 Q25 30 10 20 Q15 30 5 40 Q25 35 50 35 Q90 50 110 30 Z" fill="${color}" opacity="0.9"/>
-                    <path d="M15 20 Q0 5 -5 15 Q5 30 10 20 Z" fill="${color}" opacity="0.8"/>
-                    <path d="M15 35 Q0 50 -5 40 Q5 30 10 35 Z" fill="${color}" opacity="0.8"/>
+                    <path d="M110 30 Q90 10 50 25 Q25 30 10 20 Q15 30 5 40 Q25 35 50 35 Q90 50 110 30 Z" fill="${colour}" opacity="0.9"/>
+                    <path d="M15 20 Q0 5 -5 15 Q5 30 10 20 Z" fill="${colour}" opacity="0.8"/>
+                    <path d="M15 35 Q0 50 -5 40 Q5 30 10 35 Z" fill="${colour}" opacity="0.8"/>
                     <circle cx="95" cy="24" r="3" fill="#ffffff"/>
                 </svg>
             `;
@@ -1631,8 +2096,8 @@
 
     function spawnRipple(x, y) {
         const r = document.createElement('div');
-        const color = state.greenhouseActive ? "rgba(167, 243, 208, 0.6)" : "rgba(255, 255, 255, 0.4)";
-        r.style.cssText = `position:absolute; width:10px; height:10px; border:2px solid ${color}; border-radius:50%; pointer-events:none; left:${x}px; top:${y}px; transition: all 1s ease-out; opacity:0.6; z-index:1;`;
+        const colour = state.greenhouseActive ? "rgba(167, 243, 208, 0.6)" : "rgba(255, 255, 255, 0.4)";
+        r.style.cssText = `position:absolute; width:10px; height:10px; border:2px solid ${colour}; border-radius:50%; pointer-events:none; left:${x}px; top:${y}px; transition: all 1s ease-out; opacity:0.6; z-index:1;`;
         document.body.appendChild(r);
         setTimeout(() => { r.style.transform = "scale(15)"; r.style.opacity = "0"; }, 20);
         setTimeout(() => r.remove(), 1000);
@@ -1660,6 +2125,11 @@
                 }
             }
         });
+        const filterWrapper = document.getElementById('journal-filter-wrapper');
+        if (filterWrapper) {
+            if (tabName === 'journal') filterWrapper.classList.remove('hidden');
+            else filterWrapper.classList.add('hidden');
+        }
         renderCompendiumContent();
     }
 
@@ -1689,15 +2159,17 @@
                 const div = document.createElement('div');
                 div.className = 'bg-white/10 rounded-2xl p-4 mb-2 flex items-center gap-4';
                 div.innerHTML = `
-                    <div class="w-16 h-16">${getFrogSVG(type, frog.isZelda)}</div>
+                    <div class="w-16 h-16 ${type.effectClass || ''}">${getFrogSVG(type, frog.outfitId || 'none', frog.isZelda)}</div>
                     <div class="flex-1">
                         <div class="font-bold text-xl flex items-center gap-2">
                             ${frog.name}
+                            ${getRarityBadge(type.rarity)}
                             ${type.isDLC ? '<span class="text-[10px] bg-yellow-400 text-black font-extrabold px-2 py-0.5 rounded-full">DLC</span>' : ''}
                         </div>
-                        <div class="text-xs text-yellow-200 uppercase">${frog.isZelda ? 'Legendary' : type.species} • Bonus: ${type.bonusWeather}</div>
+                        <div class="text-xs text-yellow-200 uppercase">Type: ${type.typeCat} • ${frog.isZelda ? 'Legendary' : type.species} • Bonus: ${type.bonusWeather} (+${((type.bonusMult - 1)*100).toFixed(0)}%)</div>
                     </div>
                     <div class="flex gap-2">
+                        <button onclick="openWardrobe(${frog.id})" class="bg-purple-600 px-3 py-2 rounded-xl font-bold cursor-pointer text-xs pointer-events-auto">Wardrobe</button>
                         <button onclick="openRenameModal(${frog.id})" class="bg-blue-500 px-3 py-2 rounded-xl font-bold cursor-pointer text-xs pointer-events-auto">Rename</button>
                         ${frog.padIndex !== -1 ? `<button onclick="removeFromPond(${frog.id})" class="bg-red-500 px-3 py-2 rounded-xl font-bold cursor-pointer text-xs pointer-events-auto">Recall</button>` : `<button onclick="startPlacement(${frog.id})" class="bg-yellow-500 text-green-900 px-3 py-2 rounded-xl font-bold cursor-pointer text-xs pointer-events-auto">Place</button>`}
                     </div>`;
@@ -1746,34 +2218,55 @@
                 content.appendChild(div);
             });
         } else if (state.activeCompendiumTab === 'journal') {
-            const grid = document.createElement('div');
-            grid.className = 'grid grid-cols-2 gap-3';
-            
-            ALL_FROG_TYPES.forEach(type => {
-                const unlocked = state.myFrogs.some(f => f.typeId === type.id);
-                const item = document.createElement('div');
-                item.className = `p-3 rounded-2xl border flex items-center gap-3 ${unlocked ? 'bg-white/10 border-white/20' : 'bg-black/30 border-white/10 opacity-60'}`;
-                
-                if (unlocked) {
-                    item.innerHTML = `
-                        <div class="w-12 h-12">${getFrogSVG(type)}</div>
-                        <div class="flex-1 overflow-hidden">
-                            <div class="font-bold text-sm truncate">${type.species}</div>
-                            <div class="text-[10px] text-yellow-200 uppercase">${type.bonusWeather} (+${((type.bonusMult - 1)*100).toFixed(0)}%)</div>
-                        </div>
-                    `;
-                } else {
-                    item.innerHTML = `
-                        <div class="w-12 h-12 flex items-center justify-center bg-black/40 rounded-xl text-white/30 font-bold text-xl">?</div>
-                        <div class="flex-1 overflow-hidden">
-                            <div class="font-bold text-sm truncate text-white/50">??? Spirit</div>
-                            <div class="text-[10px] text-white/30 uppercase">Undiscovered</div>
-                        </div>
-                    `;
-                }
-                grid.appendChild(item);
+            const filterSelect = document.getElementById('journal-rarity-select');
+            const selectedFilter = filterSelect ? filterSelect.value : 'ALL';
+
+            const raritiesToDisplay = selectedFilter === 'ALL' 
+                ? ["Pond", "Rainforest", "Legendary", "Cosmic", "DLC"] 
+                : [selectedFilter];
+
+            raritiesToDisplay.forEach(rarityName => {
+                const frogsInRarity = ALL_FROG_TYPES.filter(t => t.rarity === rarityName);
+                if (frogsInRarity.length === 0) return;
+
+                const sectionHeader = document.createElement('div');
+                sectionHeader.className = "text-xl font-bold text-yellow-300 mt-4 mb-2 uppercase tracking-wide flex items-center gap-2";
+                sectionHeader.innerHTML = `${getRarityBadge(rarityName)} Rarity (${frogsInRarity.length})`;
+                content.appendChild(sectionHeader);
+
+                const grid = document.createElement('div');
+                grid.className = 'grid grid-cols-2 gap-3 mb-4';
+
+                frogsInRarity.forEach(type => {
+                    if (type.isDLC && !state.dlcUnlocked) return;
+
+                    const unlocked = state.myFrogs.some(f => f.typeId === type.id);
+                    const item = document.createElement('div');
+                    item.className = `p-3 rounded-2xl border flex items-center gap-3 ${unlocked ? 'bg-white/10 border-white/20' : 'bg-black/30 border-white/10 opacity-60'}`;
+                    
+                    if (unlocked) {
+                        item.innerHTML = `
+                            <div class="w-12 h-12 ${type.effectClass || ''}">${getFrogSVG(type, 'none')}</div>
+                            <div class="flex-1 overflow-hidden">
+                                <div class="font-bold text-sm truncate">${type.species}</div>
+                                <div class="text-[10px] text-yellow-200 uppercase mt-0.5">Type: ${type.typeCat} • Colour: ${type.colour}</div>
+                                <div class="text-[10px] text-emerald-300 uppercase">+${((type.bonusMult - 1)*100).toFixed(0)}% Bonus</div>
+                            </div>
+                        `;
+                    } else {
+                        item.innerHTML = `
+                            <div class="w-12 h-12 flex items-center justify-center bg-black/40 rounded-xl text-white/30 font-bold text-xl">?</div>
+                            <div class="flex-1 overflow-hidden">
+                                <div class="font-bold text-sm truncate text-white/50">??? Spirit</div>
+                                <div class="text-[10px] text-white/30 uppercase mt-0.5">Type: ${type.typeCat}</div>
+                                <div class="text-[10px] text-white/30 uppercase mt-0.5">Undiscovered</div>
+                            </div>
+                        `;
+                    }
+                    grid.appendChild(item);
+                });
+                content.appendChild(grid);
             });
-            content.appendChild(grid);
         }
     }
 
@@ -1795,9 +2288,21 @@
             else if (d.type === 'windchime') passive += 100;
         });
 
-        state.myFrogs.forEach(f => { if (f.padIndex !== -1) passive += 1; });
+        state.myFrogs.forEach(f => { 
+            if (f.padIndex !== -1) {
+                passive += 1;
+                const outfit = OUTFITS.find(o => o.id === f.outfitId);
+                if (outfit) passive += outfit.bonusRibbits;
+            }
+        });
+        const placedFrogs = state.myFrogs.filter(f => f.padIndex !== -1);
+        const speciesCounts = {};
+        placedFrogs.forEach(f => { speciesCounts[f.typeId] = (speciesCounts[f.typeId] || 0) + 1; });
+        let synergyBonus = 1.0;
+        Object.values(speciesCounts).forEach(count => { if (count >= 2) synergyBonus += (count - 1) * 0.15; });
+
         const ghBonus = state.greenhouseActive ? 1.5 : 1.0;
-        if (passive > 0) gainRibbits((passive * state.mult * state.zenMult * ghBonus) / 20);
+        if (passive > 0) gainRibbits((passive * state.mult * state.zenMult * ghBonus * synergyBonus) / 20);
 
         for (let i = 0; i < state.pads; i++) {
             const p = document.getElementById(`pad-${i}`);
@@ -1840,10 +2345,12 @@
                 state.mult = decoded.m || 1.0;
                 state.evoGoal = decoded.g || 100;
                 state.myFrogs = decoded.f || [];
+                state.unlockedOutfits = decoded.outfits || ['none'];
                 state.dlcUnlocked = !!decoded.dlc;
                 state.greenhouseActive = !!decoded.gh;
                 state.ghPerks = decoded.perks || { orchid: 0, mister: 0 };
                 state.placedDecors = decoded.decors || [];
+                if (decoded.expeditions) state.expeditions = decoded.expeditions;
 
                 if (state.dlcUnlocked) {
                     localStorage.setItem("dlc_greenhouse_unlocked", "true");
